@@ -1,0 +1,12 @@
+rootProject.name = 'kpl_2143592_8905135'
+
+include "components/rsa/rsa"
+include "components/rsa/rsa_cracker"
+include "components/shift/shift"
+include "components/shift/shift_cracker"
+
+project(":components/rsa/rsa").name = "rsa"
+project(":components/rsa/rsa_cracker").name = "rsa_cracker"
+project(":components/shift/shift").name = "shift"
+project(":components/shift/shift_cracker").name = "shift_cracker"
+
