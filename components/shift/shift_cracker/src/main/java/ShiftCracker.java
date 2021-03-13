@@ -1,16 +1,11 @@
 import java.text.DecimalFormat;
 import java.util.Scanner;
 
-public class Application {
+public class ShiftCracker {
     private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00000");
 
     // rtwumjzx
-    public static void main(String... args) {
-        System.out.println("Please enter caesar-cipher encoded text (press enter to exit)");
-        System.out.println("List of decryption possibilities will be printed.\n-----");
-
-        Scanner scanner = new Scanner(System.in);
-        String source = scanner.nextLine().trim().toUpperCase();
+    public String crack(String source) {
 
         if (source.equals("")) {
             System.exit(0);
@@ -108,4 +103,6 @@ public class Application {
             System.out.println("\t\tU : " + decimalFormat.format(uFrequency / frequency));
         }
     }
+
+
 }

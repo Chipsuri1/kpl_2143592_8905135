@@ -3,29 +3,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class RSACracker {
-    private final BigInteger e;
-    private final BigInteger n;
-    private final BigInteger cipher;
+    public static final RSACracker instance = new RSACracker();
 
-    public RSACracker(BigInteger e, BigInteger n, BigInteger cipher) {
-        this.e = e;
-        this.n = n;
-        this.cipher = cipher;
+    public Port port;
+
+    public RSACracker(){
+        port = new Port();
     }
 
-    public BigInteger execute() throws RSACrackerException {
-        BigInteger p, q, d;
-        List<BigInteger> factorList = factorize(n);
+    public BigInteger innerCrack(BigInteger e, BigInteger n, BigInteger cipher){
+        try {
+            BigInteger p, q, d;
+            List<BigInteger> factorList = factorize(n);
 
-        if (factorList.size() != 2) {
-            throw new RSACrackerException("cannot determine factors p and q");
+            if (factorList.size() != 2) {
+                throw new RSACrackerException("cannot determine factors p and q");
+            }
+
+            p = factorList.get(0);
+            q = factorList.get(1);
+            BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+            d = e.modInverse(phi);
+            return cipher.modPow(d, n);
+        }catch (Exception exception){
+            throw new RuntimeException(exception.getMessage());
         }
-
-        p = factorList.get(0);
-        q = factorList.get(1);
-        BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
-        d = e.modInverse(phi);
-        return cipher.modPow(d, n);
     }
 
     public List<BigInteger> factorize(BigInteger n) {
@@ -56,4 +58,15 @@ public class RSACracker {
 
         return factorList;
     }
+
+    public static RSACracker getInstance(){
+        return instance;
+    }
+
+    public class Port implements IRSACracker{
+        public BigInteger crack(BigInteger e, BigInteger n, BigInteger cipher){
+            return innerCrack(e, n, cipher);
+        }
+    }
+
 }
