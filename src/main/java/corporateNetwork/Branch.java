@@ -1,4 +1,4 @@
 package corporateNetwork;
 
-public abstract class Branch {
+public class Branch {
 }

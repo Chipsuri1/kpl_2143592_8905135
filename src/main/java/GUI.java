@@ -1,5 +1,5 @@
-package base;
-
+import base.Configuration;
+import corporateNetwork.CorporateNetwork;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -15,6 +15,12 @@ import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class GUI extends Application{
+    private CorporateNetwork corporateNetwork;
+
+    public GUI(){
+        corporateNetwork = new CorporateNetwork();
+    }
+
     public void start(Stage primaryStage) {
         primaryStage.setTitle("MSA | Mergentheim/Mosbach Security Agency");
 
@@ -27,12 +33,19 @@ public class GUI extends Application{
                 switch (event.getCode()) {
                     case F3:
                         System.out.println("F3 is pressed");
+                        if(Configuration.instance.debugMode){
+                            Configuration.instance.debugMode = false;
+                        }else {
+                            Configuration.instance.debugMode = true;
+                        }
                         break;
                     case F5:
                         System.out.println("F5 is pressed");
+                        //run
                         break;
                     case F8:
                         System.out.println("F8 is pressed");
+                        //Show latest logfile
                         break;
                 }
             }
