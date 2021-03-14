@@ -1,22 +1,29 @@
 import java.text.DecimalFormat;
-import java.util.Scanner;
 
 public class ShiftCracker {
     private static final DecimalFormat decimalFormat = new DecimalFormat("#0.00000");
 
-    // rtwumjzx
-    public String crack(String source) {
+    public static final ShiftCracker instance = new ShiftCracker();
 
-        if (source.equals("")) {
+    public Port port;
+
+    public ShiftCracker(){
+        port = new Port();
+    }
+
+    // rtwumjzx
+    public void innerDecrypt(String encryptedMessage) {
+
+        if (encryptedMessage.equals("")) {
             System.exit(0);
         }
 
-        char[] sourceText = new char[source.length()];
-        int[] unicode = new int[source.length()];
-        int[] unicodeCopy = new int[source.length()];
+        char[] sourceText = new char[encryptedMessage.length()];
+        int[] unicode = new int[encryptedMessage.length()];
+        int[] unicodeCopy = new int[encryptedMessage.length()];
 
-        for (int count = 0; count < source.length(); count++) {
-            sourceText[count] = source.charAt(count);
+        for (int count = 0; count < encryptedMessage.length(); count++) {
+            sourceText[count] = encryptedMessage.charAt(count);
         }
 
         String hex;
@@ -101,6 +108,17 @@ public class ShiftCracker {
             System.out.println("\t\tI : " + decimalFormat.format(iFrequency / frequency));
             System.out.println("\t\tO : " + decimalFormat.format(oFrequency / frequency));
             System.out.println("\t\tU : " + decimalFormat.format(uFrequency / frequency));
+        }
+    }
+
+    public static ShiftCracker getInstance() {
+        return instance;
+    }
+
+
+    public class Port implements IShiftCracker{
+        public void decrypt(String encryptedMessage){
+            innerDecrypt(encryptedMessage);
         }
     }
 

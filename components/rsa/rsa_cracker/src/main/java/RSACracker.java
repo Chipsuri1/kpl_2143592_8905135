@@ -11,7 +11,7 @@ public class RSACracker {
         port = new Port();
     }
 
-    public BigInteger innerCrack(BigInteger e, BigInteger n, BigInteger cipher){
+    public BigInteger innerDecrypt(BigInteger e, BigInteger n, BigInteger cipher){
         try {
             BigInteger p, q, d;
             List<BigInteger> factorList = factorize(n);
@@ -65,7 +65,7 @@ public class RSACracker {
 
     public class Port implements IRSACracker{
         public BigInteger crack(BigInteger e, BigInteger n, BigInteger cipher){
-            return innerCrack(e, n, cipher);
+            return innerDecrypt(e, n, cipher);
         }
     }
 

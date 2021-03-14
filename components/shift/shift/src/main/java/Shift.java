@@ -1,18 +1,17 @@
+import java.io.File;
+
 public class Shift {
 
-    public static final Shift instance = new Shift(1);
+    public static final Shift instance = new Shift();
 
     public Port port;
 
-    //TODO remove key from constructor
-    private final int key;
-
-    public Shift(int key) {
-        this.key = key;
+    public Shift() {
         port = new Port();
     }
 
-    public String innerEncrypt(String plainText) {
+    //TODO get key
+    public String innerEncrypt(String plainText, File keyfile) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < plainText.length(); i++) {
@@ -23,7 +22,7 @@ public class Shift {
         return stringBuilder.toString();
     }
 
-    public String innerDecrypt(String cipherText) {
+    public String innerDecrypt(String cipherText, File keyfile) {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < cipherText.length(); i++) {
@@ -39,12 +38,12 @@ public class Shift {
     }
 
     public class Port implements IShift{
-        public String encrypt(String plainText) {
-            return innerEncrypt(plainText);
+        public String encrypt(String plainText, File keyfile) {
+            return innerEncrypt(plainText, keyfile);
         }
 
-        public String decrypt(String encryptedText) {
-            return innerDecrypt(encryptedText);
+        public String decrypt(String encryptedText, File keyfile) {
+            return innerDecrypt(encryptedText, keyfile);
         }
     }
 

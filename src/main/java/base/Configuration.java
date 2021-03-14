@@ -5,6 +5,7 @@ public enum Configuration {
 
     public String userDirectory = System.getProperty("user.dir");
     public String fileSeparator = System.getProperty("file.separator");
+    public final String lineSeparator = System.getProperty("line.separator");
 
     public String dataDirectory = userDirectory + fileSeparator + "data" + fileSeparator;
 
