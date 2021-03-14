@@ -1,5 +1,6 @@
 import base.Configuration;
 import corporateNetwork.CorporateNetwork;
+import entitys.HSQLDB;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
@@ -22,6 +23,8 @@ public class GUI extends Application{
     }
 
     public void start(Stage primaryStage) {
+        //Using Mülli db zeug
+        HSQLDB.instance.setupDatabase();
         primaryStage.setTitle("MSA | Mergentheim/Mosbach Security Agency");
 
         HBox hBox = new HBox();
@@ -74,6 +77,7 @@ public class GUI extends Application{
         closeButton.setOnAction(new EventHandler<ActionEvent>() {
             public void handle(ActionEvent actionEvent) {
                 System.out.println("[close] pressed");
+                HSQLDB.instance.shutdown();
                 System.exit(0);
             }
         });

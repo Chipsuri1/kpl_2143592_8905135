@@ -19,5 +19,10 @@ public enum Configuration {
     public final String pathToShiftJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
     public final String pathToShiftCrackerJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift_cracker" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
 
+    public final String driverName = "jdbc:hsqldb:";
+    public final String username = "sa";
+    public final String password = "";
+    public final String databaseFile = dataDirectory + "datastore.db";
+
     public boolean debugMode = false;
 }
