@@ -1,11 +1,8 @@
 package entitys;
 
-import com.google.common.eventbus.Subscribe;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;
-import java.io.File;
-import java.lang.reflect.Method;
 import java.util.Objects;
 
 @Entity
