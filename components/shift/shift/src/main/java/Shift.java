@@ -15,8 +15,8 @@ public class Shift {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < plainText.length(); i++) {
-            char character = (char) (plainText.codePointAt(i) + key);
-            stringBuilder.append(character);
+//            char character = (char) (plainText.codePointAt(i) + key);
+//            stringBuilder.append(character);
         }
 
         return stringBuilder.toString();
@@ -26,8 +26,8 @@ public class Shift {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int i = 0; i < cipherText.length(); i++) {
-            char character = (char) (cipherText.codePointAt(i) - key);
-            stringBuilder.append(character);
+//            char character = (char) (cipherText.codePointAt(i) - key);
+//            stringBuilder.append(character);
         }
 
         return stringBuilder.toString();
