@@ -1,4 +1,4 @@
-import entitys.HSQLDB;
+import entitys.HibernateUtil;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
