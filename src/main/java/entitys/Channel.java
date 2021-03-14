@@ -20,7 +20,7 @@ public class Channel {
     @JoinColumn(name = "participant_02", nullable = false)
     private Participant participant2;
 
-    private Channel() {
+    public Channel() {
     }
 
     public Channel(String name, Participant participant1, Participant participant2) {

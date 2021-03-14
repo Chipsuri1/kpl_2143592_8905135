@@ -1,5 +1,5 @@
-package base;
-
+import base.Configuration;
+import corporateNetwork.CorporateNetwork;
 import javafx.application.Application;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;

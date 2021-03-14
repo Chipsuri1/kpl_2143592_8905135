@@ -7,6 +7,7 @@ import javax.persistence.*;
 @Entity
 @Table(name = "algorithms")
 public class Algorithm {
+
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
@@ -21,7 +22,9 @@ public class Algorithm {
         this.name = name;
     }
 
-    private Algorithm() {
+
+    public Algorithm() {
+
     }
 
     private void setId(Integer id) {

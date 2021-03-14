@@ -2,9 +2,6 @@ package entitys;
 
 import com.google.common.eventbus.Subscribe;
 import com.sun.istack.NotNull;
-import de.dhbw.App;
-import de.dhbw.LogMessage;
-import de.dhbw.factory.AlgorithmFactory;
 
 import javax.persistence.*;
 import java.io.File;
@@ -33,7 +30,8 @@ public class Participant {
         this.type = type;
     }
 
-    private Participant() {}
+    public Participant() {}
+
 
     public Integer getId() {
         return id;
@@ -59,10 +57,10 @@ public class Participant {
         this.type = type;
     }
 
-    public static Participant byName(App app, String name) {
-        var cq = app.getSession().createQuery("FROM Participant WHERE name = :name");
-        return (Participant) cq.setParameter("name", name).getSingleResult();
-    }
+//    public static Participant byName(App app, String name) {
+//        var cq = app.getSession().createQuery("FROM Participant WHERE name = :name");
+//        return (Participant) cq.setParameter("name", name).getSingleResult();
+//    }
 
     @Override
     public boolean equals(Object o) {

@@ -11,7 +11,7 @@ public class Type {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "id")
     @NotNull
-    private Integer id;
+    public Integer id;
 
     @Column(name = "name", unique = true)
     @NotNull
