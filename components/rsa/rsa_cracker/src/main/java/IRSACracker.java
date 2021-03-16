@@ -1,5 +1,5 @@
 import java.math.BigInteger;
 
 public interface IRSACracker {
-    BigInteger crack(BigInteger e, BigInteger n, BigInteger cipher);
+    BigInteger decrypt(BigInteger e, BigInteger n, BigInteger cipher);
 }

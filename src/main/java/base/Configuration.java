@@ -8,6 +8,7 @@ public enum Configuration {
     public final String lineSeparator = System.getProperty("line.separator");
 
     public final String dataDirectory = userDirectory + fileSeparator + "data" + fileSeparator;
+    public final String logDirectory = userDirectory + fileSeparator + "log" + fileSeparator;
 
     public final String commonPathToJavaArchive = userDirectory + fileSeparator + "components" + fileSeparator;
 

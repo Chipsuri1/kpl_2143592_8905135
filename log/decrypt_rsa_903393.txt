@@ -1,0 +1,64 @@
+
+How to get particular part of string in java? [closed]
+Asked 8 years, 5 months ago
+Active 7 years, 3 months ago
+Viewed 88k times
+
+2
+
+
+1
+It's difficult to tell what is being asked here. This question is ambiguous, vague, incomplete, overly broad, or rhetorical and cannot be reasonably answered in its current form. For help clarifying this question so that it can be reopened, visit the help center.
+Closed 8 years ago.
+I want to get the particular part of String from a complete word.
+
+For example:
+
+I have the following String.
+
+# STRING_VALUES #
+and a sentence is as follows
+
+<p># STRING_VALUE #<br /># CMESSAGE #<br /># CUSTOMERADDRESS #<br /><br /></p>
+From the above, I want to get the string as follows:
+
+STRING_VALUES
+CMESSAGE
+CUSTOMERADDRESS
+How to do to get the above string? I am stuck with this.
+
+java
+string
+Share
+Follow
+edited Sep 25 '12 at 11:41
+asked Sep 25 '12 at 11:00
+
+Babu R
+97588 gold badges1717 silver badges3939 bronze badges
+3
+What have you tried? Have you at least read the javadoc of the class String? – JB Nizet Sep 25 '12 at 11:02
+1
+Are they all surrounded by a pair of # symbols? What have you tried? – user684934 Sep 25 '12 at 11:02
+1
+String functions are available in java. chk it.. docs.oracle.com/javase/1.4.2/docs/api/java/lang/String.html – Sin Sep 25 '12 at 11:03
+"particular part of String"? Can you describe that particular part please? In that case, people will be able to help you easily. – Juvanis Sep 25 '12 at 11:03
+particular part is without #. ie. STRING_VALUES – Babu R Sep 25 '12 at 11:37
+Add a comment
+7 Answers
+
+9
+
+Use split:
+
+String ss ="# STRING_VALUES #";
+String[] parts = ss.split("#");
+System.out.println(parts[1].trim()); // STRING_VALUES
+DEMO.
+
+Share
+Follow
+answered Sep 25 '12 at 11:06
+
+João Silva
+80.3k2626 gold badges144144 silver badges150150 bronze badges

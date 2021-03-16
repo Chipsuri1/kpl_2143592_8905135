@@ -64,7 +64,7 @@ public class RSACracker {
     }
 
     public class Port implements IRSACracker{
-        public BigInteger crack(BigInteger e, BigInteger n, BigInteger cipher){
+        public BigInteger decrypt(BigInteger e, BigInteger n, BigInteger cipher){
             return innerDecrypt(e, n, cipher);
         }
     }

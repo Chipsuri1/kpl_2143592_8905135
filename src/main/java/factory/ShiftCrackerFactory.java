@@ -8,21 +8,26 @@ import java.net.URLClassLoader;
 
 public class ShiftCrackerFactory {
     public static Object build() {
-        Object ShiftCrackerPort = null;
+        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/build/libs/shift_cracker.jar")) {
 
-        try {
-            URL[] urls = {new File(Configuration.instance.pathToShiftCrackerJavaArchive).toURI().toURL()};
-            URLClassLoader urlClassLoader = new URLClassLoader(urls, ShiftCrackerFactory.class.getClassLoader());
-            Class ShiftCrackerClass = Class.forName("ShiftCracker", true, urlClassLoader);
+            Object ShiftCrackerPort = null;
 
-            Object ShiftCrackerInstance = ShiftCrackerClass.getMethod("getInstance").invoke(null);
+            try {
+                URL[] urls = {new File(Configuration.instance.pathToShiftCrackerJavaArchive).toURI().toURL()};
+                URLClassLoader urlClassLoader = new URLClassLoader(urls, ShiftCrackerFactory.class.getClassLoader());
+                Class ShiftCrackerClass = Class.forName("ShiftCracker", true, urlClassLoader);
 
-            ShiftCrackerPort = ShiftCrackerClass.getDeclaredField("port").get(ShiftCrackerInstance);
-        } catch (Exception e) {
-            e.printStackTrace();
+                Object ShiftCrackerInstance = ShiftCrackerClass.getMethod("getInstance").invoke(null);
+
+                ShiftCrackerPort = ShiftCrackerClass.getDeclaredField("port").get(ShiftCrackerInstance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return ShiftCrackerPort;
+        }else {
+            return null;
         }
-
-        return ShiftCrackerPort;
     }
 }
 

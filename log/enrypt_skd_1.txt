@@ -1,0 +1,17 @@
+It's difficult to tell what is being asked here. This question is ambiguous, vague, incomplete, overly broad, or rhetorical and cannot be reasonably answered in its current form. For help clarifying this question so that it can be reopened, visit the help center.
+Closed 8 years ago.
+I want to get the particular part of String from a complete word.
+
+For example:
+
+I have the following String.
+
+# STRING_VALUES #
+and a sentence is as follows
+
+<p># STRING_VALUE #<br /># CMESSAGE #<br /># CUSTOMERADDRESS #<br /><br /></p>
+From the above, I want to get the string as follows:
+
+STRING_VALUES
+CMESSAGE
+CUSTOMERADDRESS

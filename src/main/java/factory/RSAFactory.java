@@ -8,21 +8,26 @@ import java.net.URLClassLoader;
 
 public class RSAFactory {
     public static Object build() {
-        Object RSAPort = null;
+        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/build/libs/rsa.jar")) {
 
-        try {
-            URL[] urls = {new File(Configuration.instance.pathToRSAJavaArchive).toURI().toURL()};
-            URLClassLoader urlClassLoader = new URLClassLoader(urls, RSAFactory.class.getClassLoader());
-            Class RSAClass = Class.forName("RSA", true, urlClassLoader);
+            Object RSAPort = null;
 
-            Object RSAInstance = RSAClass.getMethod("getInstance").invoke(null);
+            try {
+                URL[] urls = {new File(Configuration.instance.pathToRSAJavaArchive).toURI().toURL()};
+                URLClassLoader urlClassLoader = new URLClassLoader(urls, RSAFactory.class.getClassLoader());
+                Class RSAClass = Class.forName("RSA", true, urlClassLoader);
 
-            RSAPort = RSAClass.getDeclaredField("port").get(RSAInstance);
-        } catch (Exception e) {
-            e.printStackTrace();
+                Object RSAInstance = RSAClass.getMethod("getInstance").invoke(null);
+
+                RSAPort = RSAClass.getDeclaredField("port").get(RSAInstance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return RSAPort;
+        }else {
+            return null;
         }
-
-        return RSAPort;
     }
 }
 

@@ -1,4 +1,5 @@
 import base.Configuration;
+import base.FileReader;
 import corporateNetwork.CorporateNetwork;
 import entitys.HSQLDB;
 import javafx.application.Application;
@@ -11,15 +12,21 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import org.checkerframework.checker.units.qual.A;
 
 import java.awt.event.KeyEvent;
 import java.awt.event.KeyListener;
 
 public class GUI extends Application{
     private CorporateNetwork corporateNetwork;
+    private FileReader fileReader;
+
+    private App application;
 
     public GUI(){
         corporateNetwork = new CorporateNetwork();
+        fileReader = new FileReader();
+        application = new App();
     }
 
     public void start(Stage primaryStage) {
@@ -31,28 +38,6 @@ public class GUI extends Application{
         hBox.setPadding(new Insets(15, 12, 15, 12));
         hBox.setSpacing(10);
         hBox.setStyle("-fx-background-color: #336699;");
-        hBox.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
-            public void handle(javafx.scene.input.KeyEvent event) {
-                switch (event.getCode()) {
-                    case F3:
-                        System.out.println("F3 is pressed");
-                        if(Configuration.instance.debugMode){
-                            Configuration.instance.debugMode = false;
-                        }else {
-                            Configuration.instance.debugMode = true;
-                        }
-                        break;
-                    case F5:
-                        System.out.println("F5 is pressed");
-                        //run
-                        break;
-                    case F8:
-                        System.out.println("F8 is pressed");
-                        //Show latest logfile
-                        break;
-                }
-            }
-        });
 
         Button executeButton = new Button("Execute");
         executeButton.setPrefSize(100, 20);
@@ -67,10 +52,9 @@ public class GUI extends Application{
         outputArea.setWrapText(true);
         outputArea.setEditable(false);
 
-
-        executeButton.setOnAction(new EventHandler<ActionEvent>() {
+        executeButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
-                System.out.println("[execute] pressed");
+                executeCommand(commandLineArea.getText());
             }
         });
 
@@ -79,6 +63,31 @@ public class GUI extends Application{
                 System.out.println("[close] pressed");
                 HSQLDB.instance.shutdown();
                 System.exit(0);
+            }
+        });
+
+        hBox.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
+            public void handle(javafx.scene.input.KeyEvent event) {
+                switch (event.getCode()) {
+                    case F3:
+                        //set debug mode
+                        System.out.println("F3 is pressed");
+                        if(Configuration.instance.debugMode){
+                            Configuration.instance.debugMode = false;
+                        }else {
+                            Configuration.instance.debugMode = true;
+                        }
+                        break;
+                    case F5:
+                        //run
+                        executeCommand(commandLineArea.getText());
+                        break;
+                    case F8:
+                        //Show latest logfile
+                        System.out.println("The latest logfile is showed in the output area");
+                        outputArea.setText(fileReader.readLogFile());
+                        break;
+                }
             }
         });
 
@@ -93,4 +102,10 @@ public class GUI extends Application{
         primaryStage.show();
 
     }
+
+    private void executeCommand(String input){
+        application.executeCommands(input);
+        System.out.println("Command is executed");
+    }
+
 }

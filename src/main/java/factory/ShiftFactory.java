@@ -8,21 +8,26 @@ import java.net.URLClassLoader;
 
 public class ShiftFactory {
     public static Object build() {
-        Object ShiftPort = null;
+        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/build/libs/shift.jar")) {
 
-        try {
-            URL[] urls = {new File(Configuration.instance.pathToShiftJavaArchive).toURI().toURL()};
-            URLClassLoader urlClassLoader = new URLClassLoader(urls, ShiftFactory.class.getClassLoader());
-            Class ShiftClass = Class.forName("Shift", true, urlClassLoader);
+            Object ShiftPort = null;
 
-            Object ShiftInstance = ShiftClass.getMethod("getInstance").invoke(null);
+            try {
+                URL[] urls = {new File(Configuration.instance.pathToShiftJavaArchive).toURI().toURL()};
+                URLClassLoader urlClassLoader = new URLClassLoader(urls, ShiftFactory.class.getClassLoader());
+                Class ShiftClass = Class.forName("Shift", true, urlClassLoader);
 
-            ShiftPort = ShiftClass.getDeclaredField("port").get(ShiftInstance);
-        } catch (Exception e) {
-            e.printStackTrace();
+                Object ShiftInstance = ShiftClass.getMethod("getInstance").invoke(null);
+
+                ShiftPort = ShiftClass.getDeclaredField("port").get(ShiftInstance);
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+
+            return ShiftPort;
+        }else {
+            return null;
         }
-
-        return ShiftPort;
     }
 }
 
