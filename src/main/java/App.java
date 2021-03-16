@@ -1,12 +1,15 @@
 import base.Configuration;
 import base.LogEngine;
 import entitys.HibernateUtil;
+import entitys.HibernateUtility;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
 import factory.ShiftCrackerFactory;
 import factory.ShiftFactory;
+import org.hibernate.Query;
 import org.checkerframework.checker.units.qual.A;
 import org.hibernate.Session;
+import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
 
 import java.io.File;
@@ -16,6 +19,10 @@ import java.net.URL;
 import java.util.concurrent.*;
 
 public class App {
+
+    private SessionFactory sessionFactory;
+    private Session session;
+
     public static void main(String[] args) {
 
             App app = new App();
@@ -77,8 +84,10 @@ public class App {
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                if(Configuration.instance.debugMode){
-                    LogEngine.instance.init(command+"_"+algorithm+"_"+ (System.currentTimeMillis() / 1000L));
+                if (Configuration.instance.debugMode) {
+                    LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+                    LogEngine.instance.writeLn("Command: " + command + ",Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+                    LogEngine.instance.close();
                 }
                 break;
             case "decrypt":
@@ -101,14 +110,16 @@ public class App {
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
-                if(Configuration.instance.debugMode){
-                    LogEngine.instance.init(command+"_"+algorithm+"_"+ (System.currentTimeMillis() / 1000L));
+                if (Configuration.instance.debugMode) {
+                    LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+                    LogEngine.instance.writeLn("Command: " + command + ", Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+                    LogEngine.instance.close();
                 }
                 break;
             case "crack":
                 Object cracker;
 
-                if(input.substring(input.lastIndexOf("\"")).contains("shift")){
+                if(shift){
                     cracker = ShiftCrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
@@ -124,7 +135,7 @@ public class App {
                         e.printStackTrace();
                     }
 
-                }else if(input.substring(input.lastIndexOf("\"")).contains("rsa")){
+                }else if(rsa){
                     cracker = RSACrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
@@ -146,6 +157,20 @@ public class App {
                 }
                 break;
             case "register":
+                startSession();
+                String[] inputStrings = input.split(" ");
+                String participantName = inputStrings[2];
+                String type = inputStrings[inputStrings.length];
+
+                Query query = session.createQuery("from Participant where name = " + participantName);
+                if (query.list().isEmpty()) {
+                    //TODO put to db
+                    result = "participant " + participantName + " with type " + type + " registered and postbox_" + participantName + " created";
+                } else {
+                    result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
+                }
+//                session.save(drug zb);
+                endSession();
                 break;
             case "create":
                 break;
@@ -161,6 +186,16 @@ public class App {
                 throw new RuntimeException("invalid command, please check your input");
         }
         return result;
+    }
+
+    private void startSession() {
+        sessionFactory = HibernateUtility.getSessionFactory();
+        session = sessionFactory.openSession();
+        session.beginTransaction();
+    }
+
+    private void endSession() {
+        session.getTransaction().commit();
     }
 
 }
