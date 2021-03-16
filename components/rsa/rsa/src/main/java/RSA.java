@@ -1,16 +1,17 @@
-import org.json.simple.JSONArray;
-import org.json.simple.JSONObject;
-import org.json.simple.parser.JSONParser;
-
 import java.io.File;
-import java.io.FileReader;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
-import java.security.SecureRandom;
 import java.util.Base64;
 
 public class RSA {
+    private static final RSA instance= new RSA();
 
+    public Port port;
+
+    public RSA(){
+    port = new Port();
+    }
+    
     private BigInteger crypt(BigInteger message, Key key) {
         return message.modPow(key.getE(), key.getN());
     }
@@ -27,6 +28,10 @@ public class RSA {
 
         byte[] msg = crypt(new BigInteger(encryptedMessage.getBytes()), key).toByteArray();
         return new String(msg);
+    }
+
+    public static RSA getInstance() {
+        return instance;
     }
 
     public class Port implements IRSA {
