@@ -80,7 +80,10 @@ public class GUI extends Application{
                         break;
                     case F5:
                         //run
-                        executeCommand(commandLineArea.getText());
+                        String result = executeCommand(commandLineArea.getText());
+                        if(result != null){
+                            outputArea.setText(result);
+                        }
                         break;
                     case F8:
                         //Show latest logfile
@@ -103,9 +106,10 @@ public class GUI extends Application{
 
     }
 
-    private void executeCommand(String input){
-        application.executeCommands(input);
+    private String executeCommand(String input){
+        String result = application.executeCommands(input);
         System.out.println("Command is executed");
+        return result;
     }
 
 }

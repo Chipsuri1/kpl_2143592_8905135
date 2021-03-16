@@ -6,7 +6,10 @@ import factory.ShiftFactory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
+import java.net.URL;
 
 public class App {
     public static void main(String[] args) {
@@ -37,28 +40,30 @@ public class App {
     }
 
 
-    public void executeCommands(String input){
+    public String executeCommands(String input){
         String command = input.split(" ")[0];
-        String result;
+        String result = null;
+        String message = input.split("\"")[1];
+        String dataPath = "../../../configuration/" + input.split("keyfile")[1].substring(1);
+        File file = new File(dataPath);
         switch (command){
             case "encrypt":
-                Object encrypter;
-                if(input.contains("shitft")){
-                    encrypter = ShiftFactory.build();
-                    try {
-                        Method encryptMethod = encrypter.getClass().getMethod("encrypt");
-//                        result = (String) encryptMethod.invoke(e)
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }else if(input.contains("rsa")){
-                    encrypter = RSAFactory.build();
-                    try {
-                        Method encryptMethod = encrypter.getClass().getDeclaredMethod("encrypt");
+                Object encryptor = null;
+                if(input.substring(input.lastIndexOf("\"")).contains("shift") ){
+                    encryptor = ShiftFactory.build();
+                }else if(input.substring(input.lastIndexOf("\"")).contains("rsa")){
+                    encryptor = RSAFactory.build();
+                }
+                try {
+                    Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
+                    result = (String) encryptMethod.invoke(encryptor, message, file);
 
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
                 }
                 break;
             case "decrypt":
@@ -108,6 +113,7 @@ public class App {
             default:
                 throw new RuntimeException("invalid command, please check your input");
         }
+        return result;
     }
 
 }
