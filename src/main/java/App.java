@@ -48,14 +48,20 @@ public class App {
         String command = input.split(" ")[0];
         String result = null;
         String message = input.split("\"")[1];
-        String dataPath = "configuration/" + input.split("keyfile")[1].substring(2);
-        File file = new File(dataPath.substring(0, dataPath.length()-1));
+        String dataPath = "../../../configuration/" + input.split("keyfile")[1].substring(1);
+        String algorithm = null;
+        File file = new File(dataPath);
+
+        boolean shift = input.substring(input.lastIndexOf("\"")).contains("shift");
+        boolean rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
         switch (command){
             case "encrypt":
                 Object encryptor = null;
-                if(input.substring(input.lastIndexOf("\"")).contains("shift") ){
+                if(shift){
+                    algorithm = "shift";
                     encryptor = ShiftFactory.build();
-                }else if(input.substring(input.lastIndexOf("\"")).contains("rsa")){
+                }else if(rsa){
+                    algorithm = "rsa";
                     encryptor = RSAFactory.build();
                 }
                 try {
@@ -69,23 +75,32 @@ public class App {
                 } catch (InvocationTargetException e) {
                     e.printStackTrace();
                 }
+                if(Configuration.instance.debugMode){
+                    LogEngine.instance.init(command+"_"+algorithm+"_"+ (System.currentTimeMillis() / 1000L));
+                }
                 break;
             case "decrypt":
-                Object decrypter;
-                if(input.contains("shitft")){
+                Object decrypter = null;
+                if(shift){
+                    algorithm = "shift";
                     decrypter = ShiftFactory.build();
-                    try {
-                        Method decryptMethod = decrypter.getClass().getMethod("decrypt");
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
-                }else if(input.contains("rsa")){
+                }else if(rsa){
+                    algorithm = "rsa";
                     decrypter = RSAFactory.build();
-                    try {
-                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt");
-                    } catch (NoSuchMethodException e) {
-                        e.printStackTrace();
-                    }
+                }
+                try {
+                    Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                    result = (String) decryptMethod.invoke(decrypter, message, file);
+
+                } catch (NoSuchMethodException e) {
+                    e.printStackTrace();
+                } catch (IllegalAccessException e) {
+                    e.printStackTrace();
+                } catch (InvocationTargetException e) {
+                    e.printStackTrace();
+                }
+                if(Configuration.instance.debugMode){
+                    LogEngine.instance.init(command+"_"+algorithm+"_"+ (System.currentTimeMillis() / 1000L));
                 }
                 break;
             case "crack":
