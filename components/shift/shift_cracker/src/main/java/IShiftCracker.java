@@ -1,3 +1,3 @@
 public interface IShiftCracker {
-    void decrypt(String encryptedMessage);
+    String decrypt(String encryptedMessage);
 }

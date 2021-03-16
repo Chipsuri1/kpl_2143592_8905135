@@ -54,7 +54,12 @@ public class GUI extends Application{
 
         executeButton.setOnAction(new EventHandler<>() {
             public void handle(ActionEvent event) {
-                executeCommand(commandLineArea.getText());
+                String result = executeCommand(commandLineArea.getText());
+                if(result != null){
+                    outputArea.setText(result);
+                }else{
+                    System.out.println("Result is null");
+                }
             }
         });
 
@@ -83,6 +88,8 @@ public class GUI extends Application{
                         String result = executeCommand(commandLineArea.getText());
                         if(result != null){
                             outputArea.setText(result);
+                        }else{
+                            System.out.println("Result is null");
                         }
                         break;
                     case F8:

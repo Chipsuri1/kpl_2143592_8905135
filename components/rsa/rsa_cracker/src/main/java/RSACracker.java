@@ -12,10 +12,12 @@ public class RSACracker {
         port = new Port();
     }
 
-    public BigInteger innerDecrypt(String cipher, File publicKeyfile){
+    public String innerDecrypt(String cipher, File publicKeyfile){
+        Key key = Key.getKey(publicKeyfile);
+
         try {
             BigInteger p, q, d;
-            List<BigInteger> factorList = factorize(n);
+            List<BigInteger> factorList = factorize(key.getN());
 
             if (factorList.size() != 2) {
                 throw new RSACrackerException("cannot determine factors p and q");
@@ -24,8 +26,9 @@ public class RSACracker {
             p = factorList.get(0);
             q = factorList.get(1);
             BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
-            d = e.modInverse(phi);
-            return cipher.modPow(d, n);
+            d = key.getE().modInverse(phi);
+
+            return decrypt(cipher, new Key(key.getN(), d));
         }catch (Exception exception){
             throw new RuntimeException(exception.getMessage());
         }
@@ -58,6 +61,11 @@ public class RSACracker {
         }
 
         return factorList;
+    }
+
+    public String decrypt(String encryptedMessage, Key key) {
+        byte[] msg = new BigInteger(encryptedMessage.getBytes()).modPow(key.getE(), key.getN()).toByteArray();
+        return new String(msg);
     }
 
     public static RSACracker getInstance(){

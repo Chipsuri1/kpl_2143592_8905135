@@ -16,49 +16,18 @@ public class RSA {
     }
 
     public String innerEncrypt(String plainMessage, File publicKeyfile) {
-        Key key = getKey(publicKeyfile);
+        Key key = Key.getKey(publicKeyfile);
 
         byte[] bytes = plainMessage.getBytes(Charset.defaultCharset());
         return Base64.getEncoder().encodeToString(crypt(new BigInteger(bytes), key).toByteArray());
     }
 
     public String innerDecrypt(String encryptedMessage, File privateKeyfile) {
-        Key key = getKey(privateKeyfile);
+        Key key = Key.getKey(privateKeyfile);
 
         byte[] msg = crypt(new BigInteger(encryptedMessage.getBytes()), key).toByteArray();
         return new String(msg);
     }
-
-    public Key getKey(File keyFile) {
-        JSONParser parser = new JSONParser();
-        JSONObject jsonObject = null;
-
-        try {
-            if(keyFile.getName().contains("publicKey")){
-                jsonObject = (JSONObject) ((JSONObject) parser.parse(new FileReader(keyFile))).get("publicKey");
-
-                BigInteger n = (BigInteger) jsonObject.get("n");
-                BigInteger e = (BigInteger) jsonObject.get("e");
-
-                return new Key(n, e);
-            }else if(keyFile.getName().contains("privateKey")){
-                jsonObject = (JSONObject) ((JSONObject) parser.parse(new FileReader(keyFile))).get("privateKey");
-
-                BigInteger n = (BigInteger) jsonObject.get("n");
-                BigInteger d = (BigInteger) jsonObject.get("d");
-
-                return new Key(n, d);
-            }else {
-                System.out.println("invalid file");
-                return null;
-            }
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return null;
-        }
-    }
-
 
     public class Port implements IRSA {
 

@@ -1,3 +1,4 @@
+import java.lang.module.Configuration;
 import java.text.DecimalFormat;
 
 public class ShiftCracker {
@@ -12,7 +13,7 @@ public class ShiftCracker {
     }
 
     // rtwumjzx
-    public void innerDecrypt(String encryptedMessage) {
+    public String innerDecrypt(String encryptedMessage) {
 
         if (encryptedMessage.equals("")) {
             System.exit(0);
@@ -36,12 +37,17 @@ public class ShiftCracker {
             unicodeCopy[count] = dec;
         }
 
+        StringBuilder stringBuilder = new StringBuilder();
+
         for (int shift = 1; shift <= 25; shift++) {
-            smartShift(shift, unicode, unicodeCopy);
+            stringBuilder.append(smartShift(shift, unicode, unicodeCopy));
+            stringBuilder.append(System.getProperty("line.separator"));
         }
+
+        return stringBuilder.toString();
     }
 
-    private static void smartShift(int shift, int[] unicode, int[] unicodeCopy) {
+    private static String smartShift(int shift, int[] unicode, int[] unicodeCopy) {
         for (int x = 0; x <= unicode.length - 1; x++) {
             unicodeCopy[x] = unicode[x];
 
@@ -101,13 +107,9 @@ public class ShiftCracker {
         }
 
         if (eFrequency / frequency >= 0.05 || aFrequency / frequency >= 0.05 || iFrequency / frequency >= 0.05 || oFrequency / frequency >= 0.05 || uFrequency / frequency >= 0.05) {
-            System.out.println();
-            System.out.println("\t" + stringBuilder);
-            System.out.println("\t\tA : " + decimalFormat.format(aFrequency / frequency));
-            System.out.println("\t\tE : " + decimalFormat.format(eFrequency / frequency));
-            System.out.println("\t\tI : " + decimalFormat.format(iFrequency / frequency));
-            System.out.println("\t\tO : " + decimalFormat.format(oFrequency / frequency));
-            System.out.println("\t\tU : " + decimalFormat.format(uFrequency / frequency));
+            return stringBuilder.toString();
+        }else{
+            return null;
         }
     }
 
@@ -117,8 +119,8 @@ public class ShiftCracker {
 
 
     public class Port implements IShiftCracker{
-        public void decrypt(String encryptedMessage){
-            innerDecrypt(encryptedMessage);
+        public String decrypt(String encryptedMessage){
+            return innerDecrypt(encryptedMessage);
         }
     }
 }

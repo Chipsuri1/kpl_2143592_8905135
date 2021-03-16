@@ -1,5 +1,4 @@
 plugins {
-    id 'java'
     id 'application'
     id 'org.openjfx.javafxplugin' version '0.0.9'
 }
@@ -19,11 +18,11 @@ javafx {
 dependencies {
     implementation group: 'org.hsqldb', name: 'hsqldb', version: '2.5.1'
     //Müllis projekt war so
-    compile 'com.googlecode.json-simple:json-simple:1.1.1'
-    compile 'org.hibernate:hibernate-core:5.4.27.Final'
+    //runtimeOnly("org.hsqldb:hsqldb:2.5.1")
     implementation("com.google.guava:guava:30.1-jre")
     testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
+    compile 'org.hibernate:hibernate-core:5.4.27.Final'
 }
 
 compileJava {

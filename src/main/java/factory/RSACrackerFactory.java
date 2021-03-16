@@ -8,7 +8,7 @@ import java.net.URLClassLoader;
 
 public class RSACrackerFactory {
     public static Object build() {
-        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/build/libs/rsa_cracker.jar")) {
+        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/rsa_cracker.jar")) {
 
             Object RSACrackerPort = null;
 
