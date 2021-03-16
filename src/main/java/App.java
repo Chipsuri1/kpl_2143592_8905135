@@ -47,7 +47,11 @@ public class App {
                 Object cracker;
                 if(input.contains("shift")){
                     cracker = ShiftCrackerFactory.build();
-                    Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt");
+                    try {
+                        Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
 
                 }else if(input.contains("rsa")){
                     cracker = RSACrackerFactory.build();

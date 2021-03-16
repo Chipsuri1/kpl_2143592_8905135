@@ -1,94 +1,122 @@
-import javax.crypto.BadPaddingException;
-import javax.crypto.Cipher;
-import javax.crypto.IllegalBlockSizeException;
-import javax.crypto.NoSuchPaddingException;
 import java.io.File;
-import java.security.*;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
+import java.io.IOException;
+import java.math.BigInteger;
+import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.security.SecureRandom;
 import java.util.Base64;
 
 public class RSA {
+    private final BigInteger p;
+    private final BigInteger q;
+    private final BigInteger n;
+    private final BigInteger t;
+    private final BigInteger e;
+    private final BigInteger d;
+    private final Key publicKey;
+    private final Key privateKey;
 
-    public static final RSA instance = new RSA();
+    public RSA(int keyLength) {
+        SecureRandom randomGenerator = new SecureRandom();
 
-    public Port port;
+        p = new BigInteger(keyLength, 100, randomGenerator).nextProbablePrime();
+        q = new BigInteger(keyLength, 100, randomGenerator).nextProbablePrime();
 
-    public RSA(){
-        port = new Port();
+        n = p.multiply(q);
+        t = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
+        e = getCoPrime(t);
+        d = e.modInverse(t);
+
+        publicKey = new Key(n, e);
+
+        privateKey = new Key(n, d);
     }
 
-    //TODO get keys from file
-    private static String publicKey = "";
-    private static String privateKey = "";
+    private BigInteger crypt(BigInteger message, Key key) {
+        return message.modPow(key.getE(), key.getN());
+    }
 
-    public static PublicKey getPublicKey(String base64PublicKey){
-        PublicKey publicKey = null;
-        try{
-            X509EncodedKeySpec keySpec = new X509EncodedKeySpec(Base64.getDecoder().decode(base64PublicKey.getBytes()));
-            KeyFactory keyFactory = KeyFactory.getInstance("RSA");
-            publicKey = keyFactory.generatePublic(keySpec);
-            return publicKey;
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
+    public String innerEncrypt(String plainMessage, File publicKeyfile) {
+        Key key = getKey(publicKeyfile);
+
+        byte[] bytes = plainMessage.getBytes(Charset.defaultCharset());
+        return Base64.getEncoder().encodeToString(crypt(new BigInteger(bytes), key).toByteArray());
+    }
+
+    public String innerDecrypt(byte[] cipher, File privateKeyfile) {
+        Key key = getKey(privateKeyfile);
+
+        byte[] msg = crypt(new BigInteger(cipher), key).toByteArray();
+        return new String(msg);
+    }
+
+    public boolean isCoPrime(BigInteger c, BigInteger n) {
+        BigInteger one = new BigInteger("1");
+        return c.gcd(n).equals(one);
+    }
+
+    public BigInteger getCoPrime(BigInteger n) {
+        BigInteger result = new BigInteger(n.toString());
+        BigInteger one = new BigInteger("1");
+        BigInteger two = new BigInteger("2");
+        result = result.subtract(two);
+
+        while (result.intValue() > 1) {
+            if (result.gcd(n).equals(one))
+                break;
+            result = result.subtract(one);
         }
+
+        return result;
+    }
+
+    public Key getKey (File keyFile) throws IOException {
+        String file = "src/test/resources/myFile.json";
+        String json = new String(Files.readAllBytes(Paths.get(file)));
+        return null;
+    }
+
+    public BigInteger getP() {
+        return p;
+    }
+
+    public BigInteger getQ() {
+        return q;
+    }
+
+    public BigInteger getN() {
+        return n;
+    }
+
+    public BigInteger getT() {
+        return t;
+    }
+
+    public BigInteger getE() {
+        return e;
+    }
+
+    public BigInteger getD() {
+        return d;
+    }
+
+    public Key getPublicKey() {
         return publicKey;
     }
 
-    public static PrivateKey getPrivateKey(String base64PrivateKey){
-        PrivateKey privateKey = null;
-        PKCS8EncodedKeySpec keySpec = new PKCS8EncodedKeySpec(Base64.getDecoder().decode(base64PrivateKey.getBytes()));
-        KeyFactory keyFactory = null;
-        try {
-            keyFactory = KeyFactory.getInstance("RSA");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
-        try {
-            privateKey = keyFactory.generatePrivate(keySpec);
-        } catch (InvalidKeySpecException e) {
-            e.printStackTrace();
-        }
+    public Key getPrivateKey() {
         return privateKey;
-    }
-
-    public String innerEncrypt(String plainMessage, File publicKeyfile){
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.ENCRYPT_MODE, getPublicKey(publicKey));
-            return Base64.getEncoder().encodeToString(cipher.doFinal(plainMessage.getBytes()));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public String innerDecrypt(String encryptedMessage, File privateKeyfile){
-        try {
-            Cipher cipher = Cipher.getInstance("RSA/ECB/PKCS1Padding");
-            cipher.init(Cipher.DECRYPT_MODE, getPrivateKey(privateKey));
-            return new String(cipher.doFinal(Base64.getDecoder().decode(encryptedMessage.getBytes())));
-        }catch (Exception e){
-            e.printStackTrace();
-        }
-        return null;
-    }
-
-    public static RSA getInstance() {
-        return instance;
     }
 
     public class Port implements IRSA{
 
-        public String encrypt(String plainMessage, File publicKeyfile) {
-            return innerEncrypt(plainMessage, publicKeyfile);
+        public String encrypt(String data, File publicKeyfile) {
+            return innerEncrypt(data, publicKeyfile);
         }
 
-        public String decrypt(String encryptedMessage, File privateKeyfile) {
-            return innerDecrypt(encryptedMessage, privateKeyfile);
+        public String decrypt(String data, File privateKeyfile) {
+            return innerDecrypt(data, privateKeyfile);
         }
     }
 
