@@ -121,6 +121,4 @@ public class ShiftCracker {
             innerDecrypt(encryptedMessage);
         }
     }
-
-
 }
