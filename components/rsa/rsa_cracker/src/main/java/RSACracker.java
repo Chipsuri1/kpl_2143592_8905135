@@ -1,3 +1,4 @@
+import java.io.File;
 import java.math.BigInteger;
 import java.util.LinkedList;
 import java.util.List;
@@ -11,7 +12,7 @@ public class RSACracker {
         port = new Port();
     }
 
-    public BigInteger innerDecrypt(BigInteger e, BigInteger n, BigInteger cipher){
+    public BigInteger innerDecrypt(String cipher, File publicKeyfile){
         try {
             BigInteger p, q, d;
             List<BigInteger> factorList = factorize(n);
@@ -64,8 +65,9 @@ public class RSACracker {
     }
 
     public class Port implements IRSACracker{
-        public BigInteger decrypt(BigInteger e, BigInteger n, BigInteger cipher){
-            return innerDecrypt(e, n, cipher);
+
+        public String decrypt(String encryptedMessage, File publicKeyFile) {
+            return innerDecrypt(encryptedMessage, publicKeyFile);
         }
     }
 

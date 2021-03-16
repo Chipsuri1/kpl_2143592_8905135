@@ -1,5 +1,6 @@
+import java.io.File;
 import java.math.BigInteger;
 
 public interface IRSACracker {
-    BigInteger decrypt(BigInteger e, BigInteger n, BigInteger cipher);
+    String decrypt(String encryptedMessage, File publicKeyFile);
 }

@@ -47,7 +47,7 @@ public class App {
                     encrypter = ShiftFactory.build();
                     try {
                         Method encryptMethod = encrypter.getClass().getMethod("encrypt");
-                        result = (String) encryptMethod.invoke(e)
+//                        result = (String) encryptMethod.invoke(e)
                     } catch (NoSuchMethodException e) {
                         e.printStackTrace();
                     }
