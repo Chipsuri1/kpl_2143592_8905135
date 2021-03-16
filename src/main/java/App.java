@@ -1,6 +1,8 @@
 import entitys.HibernateUtil;
 import factory.RSACrackerFactory;
+import factory.RSAFactory;
 import factory.ShiftCrackerFactory;
+import factory.ShiftFactory;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 
@@ -37,11 +39,45 @@ public class App {
 
     public void executeCommands(String input){
         String command = input.split(" ")[0];
-
+        String result;
         switch (command){
             case "encrypt":
+                Object encrypter;
+                if(input.contains("shitft")){
+                    encrypter = ShiftFactory.build();
+                    try {
+                        Method encryptMethod = encrypter.getClass().getMethod("encrypt");
+                        result = (String) encryptMethod.invoke(e)
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }else if(input.contains("rsa")){
+                    encrypter = RSAFactory.build();
+                    try {
+                        Method encryptMethod = encrypter.getClass().getDeclaredMethod("encrypt");
+
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
             case "decrypt":
+                Object decrypter;
+                if(input.contains("shitft")){
+                    decrypter = ShiftFactory.build();
+                    try {
+                        Method decryptMethod = decrypter.getClass().getMethod("decrypt");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }else if(input.contains("rsa")){
+                    decrypter = RSAFactory.build();
+                    try {
+                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt");
+                    } catch (NoSuchMethodException e) {
+                        e.printStackTrace();
+                    }
+                }
                 break;
             case "crack":
                 Object cracker;
