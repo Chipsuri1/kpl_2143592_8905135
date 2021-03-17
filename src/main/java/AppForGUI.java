@@ -223,6 +223,19 @@ public class AppForGUI {
             case "show":
                 break;
             case "drop":
+                startSession();
+                inputStrings = input.split("channel ");
+                String channelNameDropQuery = inputStrings[1];
+                Query queryDropChannel = session.createQuery("from Channel C where C.name = :channelName");
+                queryDropChannel.setParameter("channelName", channelNameDropQuery);
+                Channel channel = (Channel) queryDropChannel.list().get(0);
+
+                session.delete(channel);
+                if(queryDropChannel.list().isEmpty()){
+                    return "unknown channel " + channelNameDropQuery;
+                }else{
+                    return "channel " + channelNameDropQuery + " deleted";
+                }
                 break;
             case "intrude":
                 startSession();

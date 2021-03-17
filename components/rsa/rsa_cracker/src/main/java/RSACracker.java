@@ -22,13 +22,10 @@ public class RSACracker {
 
     public String innerDecrypt(String cipher, File publicKeyfile){
         Key key = getKey(publicKeyfile);
-        System.out.println("D:");
 
         try {
             BigInteger p, q, d;
             List<BigInteger> factorList = factorize(key.getN());
-
-            System.out.println("D2:");
 
             if(factorList == null){
                 return "time is over 30 seconds";
