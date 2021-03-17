@@ -23,23 +23,23 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
+//        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
 //
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
 //
-//        app.executeCommands("register participant branch_hkg with type normal");
-//        app.executeCommands("register participant branch_cpt with type normal");
-//        app.executeCommands("register participant branch_sfo with type normal");
-//        app.executeCommands("register participant branch_syd with type normal");
-//        app.executeCommands("register participant branch_wuh with type normal");
-//        app.executeCommands("register participant branch_sfo with type normal");
-//        app.executeCommands("register participant msa with type intruder");
-//
-//        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
-//        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
-//        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
-////        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+        app.executeCommands("register participant branch_hkg with type normal");
+        app.executeCommands("register participant branch_cpt with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant branch_syd with type normal");
+        app.executeCommands("register participant branch_wuh with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant msa with type intruder");
+
+        app.executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
+        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
 //
 //        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
 //        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
@@ -200,10 +200,10 @@ public class AppForGUI {
                 Query query = null;
                 ArrayList<Participant> participants = new ArrayList<>();
                 inputStrings = input.split(" ");
-                if (inputStrings.length == 8) {
+                if (inputStrings.length == 7) {
                     String channelName = inputStrings[2];
-                    String participantName1 = inputStrings[5];
-                    String participantName2 = inputStrings[7];
+                    String participantName1 = inputStrings[4];
+                    String participantName2 = inputStrings[6];
                     tryToAddParticipantToList(participants, participantName1);
                     tryToAddParticipantToList(participants, participantName2);
                     if (participants.size() == 2) {
@@ -384,8 +384,9 @@ public class AppForGUI {
         executeCommands("register participant branch_wuh with type normal");
         executeCommands("register participant branch_sfo with type normal");
         executeCommands("register participant msa with type intruder");
-        executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
+        executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+        executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
     }
 }
