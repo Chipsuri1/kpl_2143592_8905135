@@ -24,27 +24,27 @@ public class AppForGUI {
 
         AppForGUI app = new AppForGUI();
 //        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
-
-        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
-        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
-
-        app.executeCommands("register participant branch_hkg with type normal");
-        app.executeCommands("register participant branch_cpt with type normal");
-        app.executeCommands("register participant branch_sfo with type normal");
-        app.executeCommands("register participant branch_syd with type normal");
-        app.executeCommands("register participant branch_wuh with type normal");
-        app.executeCommands("register participant branch_sfo with type normal");
-        app.executeCommands("register participant msa with type intruder");
-
-        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
-        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
-        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
-        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-
-        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
+//
+//        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
+//        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
+//
+//        app.executeCommands("register participant branch_hkg with type normal");
+//        app.executeCommands("register participant branch_cpt with type normal");
+//        app.executeCommands("register participant branch_sfo with type normal");
+//        app.executeCommands("register participant branch_syd with type normal");
+//        app.executeCommands("register participant branch_wuh with type normal");
+//        app.executeCommands("register participant branch_sfo with type normal");
+//        app.executeCommands("register participant msa with type intruder");
+//
+//        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
+//        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+//        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+////        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+//
+//        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
-        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
-        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
+//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
+//        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
 
 //        Transaction transaction = null;
 //        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -130,6 +130,7 @@ public class AppForGUI {
                     Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
                     result = (String) decryptMethod.invoke(decrypter, message, file);
 
+                    System.out.println(result);
                 } catch (NoSuchMethodException e) {
                     e.printStackTrace();
                 } catch (IllegalAccessException e) {

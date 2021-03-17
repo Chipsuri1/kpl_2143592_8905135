@@ -32,7 +32,7 @@ public class RSA {
 
     public String innerDecrypt(String encryptedMessage, File privateKeyfile) {
         Key key = getKey(privateKeyfile);
-        byte[] msg = new BigInteger(encryptedMessage.getBytes()).modPow(key.getE(), key.getN()).toByteArray();
+        byte[] msg = new BigInteger(Base64.getDecoder().decode(encryptedMessage)).modPow(key.getE(), key.getN()).toByteArray();
         return new String(msg);
     }
 
