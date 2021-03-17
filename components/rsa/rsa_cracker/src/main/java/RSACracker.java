@@ -38,7 +38,6 @@ public class RSACracker {
             q = factorList.get(1);
             BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
             d = key.getE().modInverse(phi);
-            System.out.println("D:" + d);
 
             return decrypt(Base64.getDecoder().decode(cipher), new Key(key.getN(), d));
         }catch (Exception exception){
@@ -83,7 +82,6 @@ public class RSACracker {
 
     public String decrypt(byte[] encryptedMessage, Key key) {
         byte[] msg = new BigInteger(encryptedMessage).modPow(key.getE(), key.getN()).toByteArray();
-        System.out.println(new String(msg));
         return new String(msg);
     }
 
