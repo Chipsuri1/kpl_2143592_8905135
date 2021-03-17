@@ -236,7 +236,6 @@ public class AppForGUI {
                 }else{
                     return "channel " + channelNameDropQuery + " deleted";
                 }
-                break;
             case "intrude":
                 startSession();
                 query = null;
