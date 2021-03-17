@@ -24,6 +24,10 @@ public class AppForGUI {
 
         AppForGUI app = new AppForGUI();
 //        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+
+        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
+        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
+
         app.executeCommands("register participant branch_hkg with type normal");
         app.executeCommands("register participant branch_cpt with type normal");
         app.executeCommands("register participant branch_sfo with type normal");
