@@ -45,28 +45,6 @@ public class AppForGUI {
 //        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
 //        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
 //        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
-
-//        Transaction transaction = null;
-//        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-//            // start a transaction
-//            transaction = session.beginTransaction();
-//            // save the student objects
-//            // commit transaction
-//            transaction.commit();
-//        } catch (Exception e) {
-//            if (transaction != null) {
-//                transaction.rollback();
-//            }
-//            e.printStackTrace();
-//        }
-//
-//        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
-//        } catch (Exception e) {
-//            if (transaction != null) {
-//                transaction.rollback();
-//            }
-//            e.printStackTrace();
-//        }
     }
 
 
@@ -76,9 +54,8 @@ public class AppForGUI {
         boolean rsa = false;
         boolean shift = false;
         File file = null;
-        String message = null;
         String dataPath;
-        String algorithm = null;
+        String message = null;
 
         if (input.contains("\"")) {
             message = input.split("\"")[1];
@@ -92,187 +69,228 @@ public class AppForGUI {
 
         switch (command) {
             case "encrypt":
-                Object encryptor = null;
-                if (shift) {
-                    algorithm = "shift";
-                    encryptor = ShiftFactory.build();
-                    try {
-                        Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
-                        result = (String) encryptMethod.invoke(encryptor, message, file);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                } else if (rsa) {
-                    algorithm = "rsa";
-                    encryptor = RSAFactory.build();
-                    try {
-                        String[] inputStrings = message.split("");
-                        Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int i = 0; i < inputStrings.length; i++) {
-                            stringBuilder.append(encryptMethod.invoke(encryptor, inputStrings[i], file) + " ");
-                        }
-                        result = stringBuilder.toString();
-
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (Configuration.instance.debugMode) {
-                    LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-                    LogEngine.instance.writeLn("Command: " + command + ", algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
-                    LogEngine.instance.close();
-                }
+                result = encrypt(shift, rsa, message, file, command);
                 break;
             case "decrypt":
-                Object decrypter = null;
-                if (shift) {
-                    algorithm = "shift";
-                    decrypter = ShiftFactory.build();
-                    try {
-                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                        result = (String) decryptMethod.invoke(decrypter, message, file);
-
-                        System.out.println(result);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                } else if (rsa) {
-                    algorithm = "rsa";
-                    decrypter = RSAFactory.build();
-                    String[] inputs = message.split(" ");
-                    try {
-                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                        StringBuilder stringBuilder = new StringBuilder();
-                        for (int i = 0; i < inputs.length; i++) {
-                            stringBuilder.append((String) decryptMethod.invoke(decrypter, inputs[i], file));
-                        }
-                        result = stringBuilder.toString();
-
-                        System.out.println(result);
-                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
-                        e.printStackTrace();
-                    }
-                }
-
-                if (Configuration.instance.debugMode) {
-                    LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-                    LogEngine.instance.writeLn("Command: " + command + ", Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
-                    LogEngine.instance.close();
-                }
+                result = decrypt(shift, rsa, message, file, command);
                 break;
             case "crack":
                 return crackEncryptedMessage(shift, rsa, message, file);
             case "register":
-                startSession();
-                String[] inputStrings = input.split(" ");
-                if (inputStrings.length == 6) {
-                    String participantName = inputStrings[2];
-                    String typeString = inputStrings[inputStrings.length - 1];
-                    Query query = session.createQuery("from Participant P WHERE P.name = :participantName");
-                    query.setParameter("participantName", participantName);
-                    List resultList = query.list();
-                    if (resultList.isEmpty()) {
-                        query = session.createQuery("from Type T WHERE T.name = :typeString");
-                        query.setParameter("typeString", typeString);
-                        resultList = query.list();
-                        Type type = null;
-                        if (resultList.isEmpty()) {
-                            type = new Type(typeString);
-                            session.save(type);
-                        } else {
-                            type = (Type) resultList.get(0);
-                        }
-                        Participant participant = new Participant(participantName, type);
-                        session.save(participant);
-                        Postbox postbox = new Postbox(participant);
-                        session.save(postbox);
-                        result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
-                    } else {
-                        result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
-                    }
-                }
-                endSession();
+                result = register(input);
                 break;
             case "create":
-                startSession();
-                Query query = null;
-                ArrayList<Participant> participants = new ArrayList<>();
-                inputStrings = input.split(" ");
-                if (inputStrings.length == 7) {
-                    String channelName = inputStrings[2];
-                    String participantName1 = inputStrings[4];
-                    String participantName2 = inputStrings[6];
-                    tryToAddParticipantToList(participants, participantName1);
-                    tryToAddParticipantToList(participants, participantName2);
-                    if (participants.size() == 2) {
-                        if (participants.get(0).equals(participants.get(1))) {
-                            result = participantName1 + " and " + participantName2 + " are identical – cannot create channel on itself";
-                        } else {
-                            query = session.createQuery("from Channel C WHERE C.name = :channelName");
-                            query.setParameter("channelName", channelName);
-                            if (query.list().isEmpty()) {
-
-                                query = session.createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
-                                query.setParameter("participant1", participants.get(0));
-                                query.setParameter("participant2", participants.get(1));
-                                List query1List = query.list();
-
-                                query = session.createQuery("from Channel C WHERE C.participant1 = :participant2 AND C.participant2 = :participant1");
-                                query.setParameter("participant1", participants.get(0));
-                                query.setParameter("participant2", participants.get(1));
-                                List query2List = query.list();
-
-                                if (query1List.isEmpty() && query2List.isEmpty()) {
-                                    Channel channel = new Channel(channelName, participants.get(0), participants.get(1));
-                                    session.save(channel);
-                                    result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
-                                } else {
-                                    result = "communication channel between " + participantName1 + " and " + participantName2 + " already exists";
-                                }
-                            } else {
-                                result = "channel " + channelName + " already exists";
-                            }
-                        }
-                    }
-                }
-                endSession();
+                result = create(input);
                 break;
             case "show":
                 result = showChannel();
-                endSession();
                 break;
             case "drop":
                 result = dropChannel(input);
-                endSession();
                 break;
             case "intrude":
-                startSession();
-                query = null;
-                inputStrings = input.split(" ");
-                String channelName = inputStrings[2];
-                String participantName = inputStrings[4];
-                query = session.createQuery("from Channel C WHERE C.name = :channelName");
-                query.setParameter("channelName", channelName);
-                if (!query.list().isEmpty()) {
-                    Type type = null;
-                    query = session.createQuery("from Type T WHERE T.name = :typeString");
-                    query.setParameter("typeString", "intruder");
-                    if (query.list().isEmpty()) {
-                        type = new Type("intruder");
-                        session.save(type);
-                    } else {
-                        type = (Type) query.list().get(0);
-                    }
-                    Participant participant = new Participant(participantName, type);
-                }
+                result = intrude(input);
                 break;
             case "send":
                 break;
             default:
                 result = "invalid command, please check your input";
         }
+        return result;
+    }
+
+    private String decrypt(boolean shift, boolean rsa, String message, File file, String command) {
+        Object decrypter = null;
+        String algorithm = null;
+        String result = null;
+        if (shift) {
+            algorithm = "shift";
+            decrypter = ShiftFactory.build();
+            try {
+                Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                result = (String) decryptMethod.invoke(decrypter, message, file);
+
+                System.out.println(result);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else if (rsa) {
+            algorithm = "rsa";
+            decrypter = RSAFactory.build();
+            String[] inputs = message.split(" ");
+            try {
+                Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < inputs.length; i++) {
+                    stringBuilder.append((String) decryptMethod.invoke(decrypter, inputs[i], file));
+                }
+                result = stringBuilder.toString();
+
+                System.out.println(result);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+        if (Configuration.instance.debugMode) {
+            LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+            LogEngine.instance.writeLn("Command: " + command + ", Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+            LogEngine.instance.close();
+        }
+        endSession();
+        return result;
+    }
+
+    private String encrypt(boolean shift, boolean rsa, String message, File file, String command) {
+        Object encryptor = null;
+        String algorithm = null;
+        String result = null;
+        if (shift) {
+            algorithm = "shift";
+            encryptor = ShiftFactory.build();
+            try {
+                Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
+                result = (String) encryptMethod.invoke(encryptor, message, file);
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        } else if (rsa) {
+            algorithm = "rsa";
+            encryptor = RSAFactory.build();
+            try {
+                String[] inputStrings = message.split("");
+                Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (int i = 0; i < inputStrings.length; i++) {
+                    stringBuilder.append(encryptMethod.invoke(encryptor, inputStrings[i], file) + " ");
+                }
+                result = stringBuilder.toString();
+
+            } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                e.printStackTrace();
+            }
+        }
+
+        if (Configuration.instance.debugMode) {
+            LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+            LogEngine.instance.writeLn("Command: " + command + ", algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
+            LogEngine.instance.close();
+        }
+        endSession();
+        return result;
+    }
+
+
+    private String register(String input) {
+        String result = null;
+        startSession();
+        String[] inputStrings = input.split(" ");
+        if (inputStrings.length == 6) {
+            String participantName = inputStrings[2];
+            String typeString = inputStrings[inputStrings.length - 1];
+            Query query = session.createQuery("from Participant P WHERE P.name = :participantName");
+            query.setParameter("participantName", participantName);
+            List resultList = query.list();
+            if (resultList.isEmpty()) {
+                query = session.createQuery("from Type T WHERE T.name = :typeString");
+                query.setParameter("typeString", typeString);
+                resultList = query.list();
+                Type type = null;
+                if (resultList.isEmpty()) {
+                    type = new Type(typeString);
+                    session.save(type);
+                } else {
+                    type = (Type) resultList.get(0);
+                }
+                Participant participant = new Participant(participantName, type);
+                session.save(participant);
+                Postbox postbox = new Postbox(participant);
+                session.save(postbox);
+                result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
+            } else {
+                result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
+            }
+        }
+        endSession();
+        return result;
+    }
+
+    private String create(String input) {
+        startSession();
+        Query query = null;
+        String result = null;
+        ArrayList<Participant> participants = new ArrayList<>();
+        String[] inputStrings = input.split(" ");
+        if (inputStrings.length == 7) {
+            String channelName = inputStrings[2];
+            String participantName1 = inputStrings[4];
+            String participantName2 = inputStrings[6];
+            tryToAddParticipantToList(participants, participantName1);
+            tryToAddParticipantToList(participants, participantName2);
+            if (participants.size() == 2) {
+                if (participants.get(0).equals(participants.get(1))) {
+                    result = participantName1 + " and " + participantName2 + " are identical – cannot create channel on itself";
+                } else {
+                    query = session.createQuery("from Channel C WHERE C.name = :channelName");
+                    query.setParameter("channelName", channelName);
+                    if (query.list().isEmpty()) {
+
+                        query = session.createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
+                        query.setParameter("participant1", participants.get(0));
+                        query.setParameter("participant2", participants.get(1));
+                        List query1List = query.list();
+
+                        query = session.createQuery("from Channel C WHERE C.participant1 = :participant2 AND C.participant2 = :participant1");
+                        query.setParameter("participant1", participants.get(0));
+                        query.setParameter("participant2", participants.get(1));
+                        List query2List = query.list();
+
+                        if (query1List.isEmpty() && query2List.isEmpty()) {
+                            Channel channel = new Channel(channelName, participants.get(0), participants.get(1));
+                            session.save(channel);
+                            result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
+                        } else {
+                            result = "communication channel between " + participantName1 + " and " + participantName2 + " already exists";
+                        }
+                    } else {
+                        result = "channel " + channelName + " already exists";
+                    }
+                }
+            }
+        }
+        endSession();
+        return result;
+    }
+
+    private String intrude(String input) {
+        startSession();
+        String result = null;
+        boolean successful = false;
+        Participant participant = null;
+        Query query = null;
+        String[] inputStrings = input.split(" ");
+        String channelName = inputStrings[2];
+        String participantName = inputStrings[4];
+//       hier den channel mit parti nehmen
+        query = session.createQuery("from Channel C WHERE C.name = :channelName");
+        query.setParameter("channelName", channelName);
+        if (!query.list().isEmpty()) {
+            Type type = null;
+            query = session.createQuery("from Type T WHERE T.name = :typeString");
+            query.setParameter("typeString", "intruder");
+            if (query.list().isEmpty()) {
+                type = new Type("intruder");
+                session.save(type);
+            } else {
+                type = (Type) query.list().get(0);
+            }
+            participant = new Participant(participantName, type);
+        }
+        if (successful) {
+            result = "intruder " + participant.getName() + " cracked message from participant [name] | [message]";
+        } else {
+            result = "intruder [name] | crack message from participant [name] failed";
+        }
+        endSession();
         return result;
     }
 
@@ -293,7 +311,7 @@ public class AppForGUI {
         return null;
     }
 
-    private String crackEncryptedMessageRSA(String message, File file){
+    private String crackEncryptedMessageRSA(String message, File file) {
         Object cracker = RSACrackerFactory.build();
         try {
             Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
@@ -316,7 +334,8 @@ public class AppForGUI {
             return null;
         }
     }
-    private String crackEncryptedMessageShift(String message){
+
+    private String crackEncryptedMessageShift(String message) {
         Object cracker = ShiftCrackerFactory.build();
         try {
             Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
@@ -334,7 +353,8 @@ public class AppForGUI {
         }
     }
 
-    private String dropChannel(String input){
+    private String dropChannel(String input) {
+        String result = null;
         startSession();
         String[] inputStrings = input.split("channel ");
         String channelNameDropQuery = inputStrings[1];
@@ -345,14 +365,16 @@ public class AppForGUI {
         Channel channel = (Channel) queryDropChannel.list().get(0);
 
         session.delete(channel);
-        if(queryDropChannel.list().isEmpty()){
-            return "unknown channel " + channelNameDropQuery;
-        }else{
-            return "channel " + channelNameDropQuery + " deleted";
+        if (queryDropChannel.list().isEmpty()) {
+            result = "unknown channel " + channelNameDropQuery;
+        } else {
+            result = "channel " + channelNameDropQuery + " deleted";
         }
+        endSession();
+        return result;
     }
 
-    private String showChannel(){
+    private String showChannel() {
         startSession();
         Query showChannelQuery = session.createQuery("FROM Channel");
 
@@ -364,7 +386,7 @@ public class AppForGUI {
             stringBuilder.append(Configuration.instance.lineSeparator);
         }
         System.out.println(stringBuilder.toString());
-
+        endSession();
         return stringBuilder.toString();
     }
 
