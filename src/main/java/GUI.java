@@ -12,21 +12,17 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
-import org.checkerframework.checker.units.qual.A;
-
-import java.awt.event.KeyEvent;
-import java.awt.event.KeyListener;
 
 public class GUI extends Application{
     private CorporateNetwork corporateNetwork;
     private FileReader fileReader;
 
-    private App application;
+    private AppForGUI application;
 
     public GUI(){
         corporateNetwork = new CorporateNetwork();
         fileReader = new FileReader();
-        application = new App();
+        application = new AppForGUI();
     }
 
     public void start(Stage primaryStage) {

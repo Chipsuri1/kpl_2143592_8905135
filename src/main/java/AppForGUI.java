@@ -1,32 +1,30 @@
 import base.Configuration;
 import base.LogEngine;
-import entitys.HibernateUtil;
 import entitys.HibernateUtility;
+import entitys.Participant;
+import entitys.Type;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
 import factory.ShiftCrackerFactory;
 import factory.ShiftFactory;
 import org.hibernate.Query;
-import org.checkerframework.checker.units.qual.A;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.hibernate.Transaction;
 
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.net.URL;
 import java.util.concurrent.*;
 
-public class App {
+public class AppForGUI {
 
     private SessionFactory sessionFactory;
     private Session session;
 
     public static void main(String[] args) {
 
-            App app = new App();
-            app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+        AppForGUI app = new AppForGUI();
+        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
 
 
 //        Transaction transaction = null;
@@ -53,23 +51,33 @@ public class App {
     }
 
 
-    public String executeCommands(String input){
+    public String executeCommands(String input) {
         String command = input.split(" ")[0];
         String result = null;
-        String message = input.split("\"")[1];
-        String dataPath = "../../../configuration/" + input.split("keyfile")[1].substring(1);
+        boolean rsa = false;
+        boolean shift = false;
+        File file = null;
+        String message = null;
+        String dataPath = null;
         String algorithm = null;
-        File file = new File(dataPath);
 
-        boolean shift = input.substring(input.lastIndexOf("\"")).contains("shift");
-        boolean rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
-        switch (command){
+        if(input.contains("\"")){
+            message = input.split("\"")[1];
+            shift = input.substring(input.lastIndexOf("\"")).contains("shift");
+            rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
+        }
+        if(input.contains("keyfile")){
+            dataPath = "../../../configuration/" + input.split("keyfile")[1].substring(1);
+            file = new File(dataPath);
+        }
+
+        switch (command) {
             case "encrypt":
                 Object encryptor = null;
-                if(shift){
+                if (shift) {
                     algorithm = "shift";
                     encryptor = ShiftFactory.build();
-                }else if(rsa){
+                } else if (rsa) {
                     algorithm = "rsa";
                     encryptor = RSAFactory.build();
                 }
@@ -92,10 +100,10 @@ public class App {
                 break;
             case "decrypt":
                 Object decrypter = null;
-                if(shift){
+                if (shift) {
                     algorithm = "shift";
                     decrypter = ShiftFactory.build();
-                }else if(rsa){
+                } else if (rsa) {
                     algorithm = "rsa";
                     decrypter = RSAFactory.build();
                 }
@@ -119,7 +127,7 @@ public class App {
             case "crack":
                 Object cracker;
 
-                if(shift){
+                if (shift) {
                     cracker = ShiftCrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
@@ -129,7 +137,7 @@ public class App {
                         try {
                             final Future<Object> f = service.submit(() -> {
                                 // Do you long running calculation here
-                                encryptedMessage[0] = (String) decryptMethod.invoke(message); // Simulate some delay
+//                                encryptedMessage[0] = (String) decryptMethod.invoke(message); // Simulate some delay
                                 return encryptedMessage[0];
                             });
 
@@ -142,7 +150,7 @@ public class App {
                         e.printStackTrace();
                     }
 
-                }else if(rsa){
+                } else if (rsa) {
                     cracker = RSACrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
@@ -152,7 +160,7 @@ public class App {
                         try {
                             final Future<Object> f = service.submit(() -> {
                                 // Do you long running calculation here
-                                encryptedMessage[0] = (String) decryptMethod.invoke(message, file); // Simulate some delay
+//                                encryptedMessage[0] = (String) decryptMethod.invoke(message, file); // Simulate some delay
                                 return encryptedMessage[0];
                             });
 
@@ -170,16 +178,21 @@ public class App {
                 startSession();
                 String[] inputStrings = input.split(" ");
                 String participantName = inputStrings[2];
-                String type = inputStrings[inputStrings.length];
+                String typeString = inputStrings[inputStrings.length - 1];
 
-                Query query = session.createQuery("from Participant where name = " + participantName);
-                if (query.list().isEmpty()) {
+                Query query = session.createQuery("from Participant WHERE name = " + participantName);
+//                if (query.list().get(0) == null) {
                     //TODO put to db
-                    result = "participant " + participantName + " with type " + type + " registered and postbox_" + participantName + " created";
-                } else {
-                    result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
-                }
-//                session.save(drug zb);
+                    Type type = new Type(typeString);
+                    session.save(type);
+                    Participant participant = new Participant(participantName, type);
+                    session.save(participant);
+//                    Postbox postbox = new Postbox();
+//                    session.save(postbox);
+                    result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
+//                } else {
+//                    result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
+//                }
                 endSession();
                 break;
             case "create":
@@ -193,7 +206,7 @@ public class App {
             case "send":
                 break;
             default:
-                throw new RuntimeException("invalid command, please check your input");
+                result = "invalid command, please check your input";
         }
         return result;
     }
