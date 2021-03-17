@@ -338,6 +338,8 @@ public class AppForGUI {
         startSession();
         String[] inputStrings = input.split("channel ");
         String channelNameDropQuery = inputStrings[1];
+        System.out.println(channelNameDropQuery);
+
         Query queryDropChannel = session.createQuery("from Channel C where C.name = :channelName");
         queryDropChannel.setParameter("channelName", channelNameDropQuery);
         Channel channel = (Channel) queryDropChannel.list().get(0);
@@ -355,6 +357,7 @@ public class AppForGUI {
         Query showChannelQuery = session.createQuery("FROM Channel");
 
         StringBuilder stringBuilder = new StringBuilder();
+        System.out.println(showChannelQuery.list().size());
         for (int i = 0; i < showChannelQuery.list().size(); i++) {
             Channel channel = (Channel) showChannelQuery.list().get(i);
             stringBuilder.append(channel.getName());
