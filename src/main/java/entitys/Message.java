@@ -41,7 +41,8 @@ public class Message {
     @Column(name = "timestamp")
     private Integer timestamp;
 
-    public Message() {}
+    public Message() {
+    }
 
     public Message(Participant participantFrom,
                    Participant participantTo,

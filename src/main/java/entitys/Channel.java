@@ -1,11 +1,14 @@
 package entitys;
 
+import com.google.common.eventbus.EventBus;
 import com.sun.istack.NotNull;
+
 import javax.persistence.*;
 
 @Entity
 @Table(name = "channel")
 public class Channel {
+
 
     //TODO wo kommt der eventbus rein
     @Id
@@ -21,6 +24,7 @@ public class Channel {
     @JoinColumn(name = "participant_02", nullable = false)
     private Participant participant2;
 
+
     public Channel() {
     }
 
@@ -29,6 +33,7 @@ public class Channel {
         this.participant1 = participant1;
         this.participant2 = participant2;
     }
+
 
     public String getName() {
         return name;

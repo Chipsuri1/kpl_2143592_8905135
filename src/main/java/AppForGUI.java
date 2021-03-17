@@ -24,10 +24,10 @@ public class AppForGUI {
 
         AppForGUI app = new AppForGUI();
 //        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
-//
+
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
-//
+
         app.executeCommands("register participant branch_hkg with type normal");
         app.executeCommands("register participant branch_cpt with type normal");
         app.executeCommands("register participant branch_sfo with type normal");
@@ -40,7 +40,7 @@ public class AppForGUI {
         app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-//
+
 //        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
 //        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
 //        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
@@ -92,10 +92,64 @@ public class AppForGUI {
                 result = intrude(input);
                 break;
             case "send":
+                result = send(shift, rsa, message, file, input);
                 break;
             default:
                 result = "invalid command, please check your input";
         }
+        return result;
+    }
+
+    private String send(boolean shift, boolean rsa, String message, File file, String input) {
+        startSession();
+        String result = null;
+        String cipher = null;
+        String algorithm = null;
+        if (shift) {
+            algorithm = "shift";
+        } else if(rsa){
+            algorithm = "rsa";
+        }
+
+        Query query = null;
+        ArrayList<Participant> participants = new ArrayList<>();
+        String[] inputStrings = input.split(" ");
+        String participantName1 = null;
+        String participantName2 = null;
+        if (inputStrings.length == 11) {
+            participantName1 = inputStrings[4];
+            participantName2 = inputStrings[6];
+            tryToAddParticipantToList(participants, participantName1);
+            tryToAddParticipantToList(participants, participantName2);
+            if (participants.size() == 2) {
+                if (participants.get(0).equals(participants.get(1))) {
+                    result = "no valid channel from " + participantName1 + " to "+participantName2;
+                } else {
+                    cipher = executeCommands("encrypt message \"" + message + "\" using " + algorithm + " and keyfile " + file.getName().split("/")[1]);
+
+                    query = session.createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
+                    query.setParameter("participant1", participants.get(0));
+                    query.setParameter("participant2", participants.get(1));
+                    List queryList = query.list();
+                    if (!queryList.isEmpty()) {
+                        Channel channel = (Channel) queryList.get(0);
+
+                        query = session.createQuery("from Algorithm A WHERE A.name = :algorithm");
+                        query.setParameter("algorithm", algorithm);
+                        Algorithm algorithmEntity = (Algorithm)query.list().get(0);
+                        Message messageEntity = new Message(participants.get(0), participants.get(1), message, algorithmEntity, cipher, file.getName().split("/")[1]);
+                        session.save(messageEntity);
+                        message = executeCommands("decrypt message \"" + cipher + "\" using " + algorithm + " and keyfile " + file.getName().split("/")[1]);
+                        //postbox von part2 getten und dann neuen eintrag machen
+                        result = participantName2 + " received new message";
+                    } else {
+                        result = "no valid channel from " + participantName1 + " to "+participantName2;
+                    }
+                }
+            }
+        }
+
+        endSession();
         return result;
     }
 
@@ -270,20 +324,19 @@ public class AppForGUI {
         String[] inputStrings = input.split(" ");
         String channelName = inputStrings[2];
         String participantName = inputStrings[4];
-//       hier den channel mit parti nehmen
+
         query = session.createQuery("from Channel C WHERE C.name = :channelName");
         query.setParameter("channelName", channelName);
         if (!query.list().isEmpty()) {
+
             Type type = null;
             query = session.createQuery("from Type T WHERE T.name = :typeString");
             query.setParameter("typeString", "intruder");
-            if (query.list().isEmpty()) {
-                type = new Type("intruder");
-                session.save(type);
-            } else {
-                type = (Type) query.list().get(0);
-            }
-            participant = new Participant(participantName, type);
+            type = (Type) query.list().get(0);
+            query = session.createQuery("from Participant P WHERE P.type = :type");
+            query.setParameter("type", type);
+            participant = (Participant) query.list().get(0);
+
         }
         if (successful) {
             result = "intruder " + participant.getName() + " cracked message from participant [name] | [message]";
@@ -411,5 +464,12 @@ public class AppForGUI {
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+
+        startSession();
+        Algorithm algorithm = new Algorithm("rsa");
+        session.save(algorithm);
+        algorithm = new Algorithm("shift");
+        session.save(algorithm);
+        endSession();
     }
 }
