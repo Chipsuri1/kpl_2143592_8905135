@@ -40,6 +40,12 @@ public class AppForGUI {
         app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+
+        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
+        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
+        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
+
 //        Transaction transaction = null;
 //        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 //            // start a transaction
@@ -107,7 +113,7 @@ public class AppForGUI {
                 }
                 if (Configuration.instance.debugMode) {
                     LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-                    LogEngine.instance.writeLn("Command: " + command + ",Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+                    LogEngine.instance.writeLn("Command: " + command + ", algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
                     LogEngine.instance.close();
                 }
                 break;
@@ -175,7 +181,6 @@ public class AppForGUI {
                 Query query = null;
                 ArrayList<Participant> participants = new ArrayList<>();
                 inputStrings = input.split(" ");
-                System.out.println(inputStrings.length);
                 if (inputStrings.length == 8) {
                     String channelName = inputStrings[2];
                     String participantName1 = inputStrings[5];
@@ -239,7 +244,6 @@ public class AppForGUI {
                     }
                     Participant participant = new Participant(participantName, type);
                 }
-                System.out.println(inputStrings.length);
                 break;
             case "send":
                 break;
@@ -252,7 +256,6 @@ public class AppForGUI {
     private void tryToAddParticipantToList(ArrayList<Participant> participants, String participantName) {
         Query query = session.createQuery("From Participant P WHERE P.name = :participantName");
         query.setParameter("participantName", participantName);
-        System.out.println("yeah");
         if (!query.list().isEmpty()) {
             participants.add((Participant) query.list().get(0));
         }

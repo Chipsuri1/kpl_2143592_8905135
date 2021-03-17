@@ -1,6 +1,12 @@
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.File;
+import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.charset.Charset;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.Base64;
 
 public class RSA {
@@ -46,36 +52,35 @@ public class RSA {
     }
 
     public Key getKey(File keyFile) {
-//        JsonParser jsonParser = new JsonParser();
-//        JsonObject jsonObject = null;
-//        JSONParser parser = new JSONParser();
-//        JSONObject jsonObject = null;
-//
-//        try {
-//            if(keyFile.getName().contains("publicKey")){
-//                jsonObject = (JSONObject) ((JSONObject) parser.parse(new FileReader(keyFile))).get("publicKey");
-//
-//                BigInteger n = (BigInteger) jsonObject.get("n");
-//                BigInteger e = (BigInteger) jsonObject.get("e");
-//
-//                return new Key(n, e);
-//            }else if(keyFile.getName().contains("privateKey")){
-//                jsonObject = (JSONObject) ((JSONObject) parser.parse(new FileReader(keyFile))).get("privateKey");
-//
-//                BigInteger n = (BigInteger) jsonObject.get("n");
-//                BigInteger d = (BigInteger) jsonObject.get("d");
-//
-//                return new Key(n, d);
-//            }else {
-//                System.out.println("invalid file");
-//                return null;
-//            }
-//
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//            return null;
-//        }
-//    }}
-        return null;
+        String json = null;
+        try {
+            json = new String(Files.readAllBytes(Paths.get(String.valueOf(keyFile))));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+
+        try {
+            if (keyFile.getName().contains("publicKey")) {
+
+                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("n").getAsString());
+                BigInteger e = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("e").getAsString());
+
+                return new Key(n, e);
+            } else if (keyFile.getName().contains("privateKey")) {
+
+                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("privateKey").get("n").getAsString());
+                BigInteger d = new BigInteger(jsonObject.getAsJsonObject("privateKey").get("d").getAsString());
+
+                return new Key(n, d);
+            } else {
+                System.out.println("invalid file");
+                return null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
