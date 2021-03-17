@@ -67,7 +67,7 @@ public class AppForGUI {
             rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
         }
         if(input.contains("keyfile")){
-            dataPath = "../../../configuration/" + input.split("keyfile")[1].substring(1);
+            dataPath = "configuration/" + input.split("keyfile")[1].substring(1);
             file = new File(dataPath);
         }
 
@@ -131,20 +131,13 @@ public class AppForGUI {
                     cracker = ShiftCrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
-                        final String[] encryptedMessage = new String[1];
+                        String encryptedMessage = (String) decryptMethod.invoke(message);
 
-                        final ExecutorService service = Executors.newSingleThreadExecutor();
-                        try {
-                            final Future<Object> f = service.submit(() -> {
-                                // Do you long running calculation here
-//                                encryptedMessage[0] = (String) decryptMethod.invoke(message); // Simulate some delay
-                                return encryptedMessage[0];
-                            });
-
-                            System.out.println(f.get(30, TimeUnit.SECONDS));
-                        } catch (final TimeoutException e) {
+                        if(encryptedMessage.equals("time is over 30 seconds")){
                             System.err.println("Calculation took to long");
                             return "cracking encrypted method \"" + message + "\" failed";
+                        }else {
+                            return encryptedMessage;
                         }
                     } catch (final Exception e) {
                         e.printStackTrace();
@@ -154,20 +147,17 @@ public class AppForGUI {
                     cracker = RSACrackerFactory.build();
                     try {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                        final String[] encryptedMessage = new String[1];
 
-                        final ExecutorService service = Executors.newSingleThreadExecutor();
-                        try {
-                            final Future<Object> f = service.submit(() -> {
-                                // Do you long running calculation here
-//                                encryptedMessage[0] = (String) decryptMethod.invoke(message, file); // Simulate some delay
-                                return encryptedMessage[0];
-                            });
+                        String encryptedMessage = (String) decryptMethod.invoke(decryptMethod, message, file);
+                        System.out.println(file.getName());
 
-                            System.out.println(f.get(30, TimeUnit.SECONDS));
-                        } catch (final TimeoutException e) {
+
+
+                        if(encryptedMessage.equals("time is over 30 seconds")){
                             System.err.println("Calculation took to long");
                             return "cracking encrypted method \"" + message + "\" failed";
+                        }else {
+                            return encryptedMessage;
                         }
                     } catch (Exception e) {
                         e.printStackTrace();
@@ -206,7 +196,7 @@ public class AppForGUI {
             case "send":
                 break;
             default:
-                result = "invalid command, please check your input";
+                throw new RuntimeException("invalid command, please check your input");
         }
         return result;
     }

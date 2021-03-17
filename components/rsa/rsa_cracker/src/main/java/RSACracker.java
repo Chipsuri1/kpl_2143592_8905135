@@ -19,6 +19,9 @@ public class RSACracker {
             BigInteger p, q, d;
             List<BigInteger> factorList = factorize(key.getN());
 
+            if(factorList == null){
+                return "time is over 30 seconds";
+            }
             if (factorList.size() != 2) {
                 throw new RSACrackerException("cannot determine factors p and q");
             }
@@ -35,6 +38,8 @@ public class RSACracker {
     }
 
     public List<BigInteger> factorize(BigInteger n) {
+        long unixTimeStart = System.currentTimeMillis() / 1000L;
+
         BigInteger two = BigInteger.valueOf(2);
         List<BigInteger> factorList = new LinkedList<>();
 
@@ -50,6 +55,10 @@ public class RSACracker {
         if (n.compareTo(BigInteger.ONE) > 0) {
             BigInteger factor = BigInteger.valueOf(3);
             while (factor.multiply(factor).compareTo(n) <= 0) {
+                long unixTimeStampNow = System.currentTimeMillis() / 1000L;
+                if(unixTimeStampNow - unixTimeStart >= 30){
+                    return null;
+                }
                 if (n.mod(factor).equals(BigInteger.ZERO)) {
                     factorList.add(factor);
                     n = n.divide(factor);

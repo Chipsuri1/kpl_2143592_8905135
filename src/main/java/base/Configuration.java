@@ -15,10 +15,10 @@ public enum Configuration {
     public final String inputDataFile = dataDirectory + fileSeparator + "input.txt";
     public final String encryptedDataFile = dataDirectory + fileSeparator + "encrypted.txt";
 
-    public final String pathToRSAJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator+ "rsa" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
-    public final String pathToRSACrackerJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator + "rsa_cracker" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
-    public final String pathToShiftJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
-    public final String pathToShiftCrackerJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift_cracker" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "boyerMoore.jar";
+    public final String pathToRSAJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator+ "rsa" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "rsa.jar";
+    public final String pathToRSACrackerJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator + "rsa_cracker" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "rsa_cracker.jar";
+    public final String pathToShiftJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "shift.jar";
+    public final String pathToShiftCrackerJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift_cracker" + fileSeparator + "build" + fileSeparator + "libs" + fileSeparator + "shift_cracker.jar";
 
     public final String driverName = "jdbc:hsqldb:";
     public final String username = "sa";
