@@ -13,6 +13,10 @@ public class Postbox {
     @NotNull
     private Integer id;
 
+    public Postbox(Participant participantTo) {
+        this.participantTo = participantTo;
+    }
+
     @ManyToOne
     @JoinColumn(name = "participant_to_id")
     private Participant participantTo;

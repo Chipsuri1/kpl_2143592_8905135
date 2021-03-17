@@ -72,12 +72,12 @@ public class GUI extends Application{
                 switch (event.getCode()) {
                     case F3:
                         //set debug mode
-                        System.out.println("F3 is pressed");
                         if(Configuration.instance.debugMode){
                             Configuration.instance.debugMode = false;
                         }else {
                             Configuration.instance.debugMode = true;
                         }
+                        outputArea.setText("Debug mode is: "+Configuration.instance.debugMode);
                         break;
                     case F5:
                         //run

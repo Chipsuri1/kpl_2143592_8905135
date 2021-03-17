@@ -1,12 +1,13 @@
 package entitys;
 
 import com.sun.istack.NotNull;
-
 import javax.persistence.*;
 
 @Entity
 @Table(name = "channel")
 public class Channel {
+
+    //TODO wo kommt der eventbus rein
     @Id
     @Column(name = "name", unique = true)
     @NotNull
