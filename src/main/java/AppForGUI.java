@@ -362,12 +362,12 @@ public class AppForGUI {
 
         Query queryDropChannel = session.createQuery("from Channel C where C.name = :channelName");
         queryDropChannel.setParameter("channelName", channelNameDropQuery);
-        Channel channel = (Channel) queryDropChannel.list().get(0);
 
-        session.delete(channel);
-        if (queryDropChannel.list().isEmpty()) {
+        if (queryDropChannel.list().size() == 0) {
             result = "unknown channel " + channelNameDropQuery;
         } else {
+            Channel channel = (Channel) queryDropChannel.list().get(0);
+            session.delete(channel);
             result = "channel " + channelNameDropQuery + " deleted";
         }
         endSession();
@@ -379,13 +379,11 @@ public class AppForGUI {
         Query showChannelQuery = session.createQuery("FROM Channel");
 
         StringBuilder stringBuilder = new StringBuilder();
-        System.out.println(showChannelQuery.list().size());
         for (int i = 0; i < showChannelQuery.list().size(); i++) {
             Channel channel = (Channel) showChannelQuery.list().get(i);
-            stringBuilder.append(channel.getName());
+            stringBuilder.append(channel.getName() + " | " + channel.getParticipant1().getName() + " and " + channel.getParticipant2().getName());
             stringBuilder.append(Configuration.instance.lineSeparator);
         }
-        System.out.println(stringBuilder.toString());
         endSession();
         return stringBuilder.toString();
     }

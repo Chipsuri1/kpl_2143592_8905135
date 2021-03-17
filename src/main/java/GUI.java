@@ -67,6 +67,36 @@ public class GUI extends Application{
             }
         });
 
+        commandLineArea.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
+            public void handle(javafx.scene.input.KeyEvent event) {
+                switch (event.getCode()) {
+                    case F3:
+                        //set debug mode
+                        if(Configuration.instance.debugMode){
+                            Configuration.instance.debugMode = false;
+                        }else {
+                            Configuration.instance.debugMode = true;
+                        }
+                        outputArea.setText("Debug mode is: "+Configuration.instance.debugMode);
+                        break;
+                    case F5:
+                        //run
+                        String result = executeCommand(commandLineArea.getText());
+                        if(result != null){
+                            outputArea.setText(result);
+                        }else{
+                            System.out.println("Result is null");
+                        }
+                        break;
+                    case F8:
+                        //Show latest logfile
+                        System.out.println("The latest logfile is showed in the output area");
+                        outputArea.setText(fileReader.readLogFile());
+                        break;
+                }
+            }
+        });
+
         hBox.setOnKeyPressed(new EventHandler<javafx.scene.input.KeyEvent>() {
             public void handle(javafx.scene.input.KeyEvent event) {
                 switch (event.getCode()) {
