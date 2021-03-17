@@ -1,8 +1,6 @@
 import base.Configuration;
 import base.LogEngine;
-import entitys.HibernateUtility;
-import entitys.Participant;
-import entitys.Type;
+import entitys.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
 import factory.ShiftCrackerFactory;
@@ -14,7 +12,8 @@ import org.hibernate.SessionFactory;
 import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.concurrent.*;
+import java.util.ArrayList;
+import java.util.List;
 
 public class AppForGUI {
 
@@ -24,9 +23,19 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+//        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("register participant branch_hkg with type normal");
+        app.executeCommands("register participant branch_cpt with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant branch_syd with type normal");
+        app.executeCommands("register participant branch_wuh with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant msa with type intruder");
 
-
+        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
+        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
 //        Transaction transaction = null;
 //        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
 //            // start a transaction
@@ -58,15 +67,15 @@ public class AppForGUI {
         boolean shift = false;
         File file = null;
         String message = null;
-        String dataPath = null;
+        String dataPath;
         String algorithm = null;
 
-        if(input.contains("\"")){
+        if (input.contains("\"")) {
             message = input.split("\"")[1];
             shift = input.substring(input.lastIndexOf("\"")).contains("shift");
             rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
         }
-        if(input.contains("keyfile")){
+        if (input.contains("keyfile")) {
             dataPath = "configuration/" + input.split("keyfile")[1].substring(1);
             file = new File(dataPath);
         }
@@ -133,10 +142,10 @@ public class AppForGUI {
                         Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
                         String encryptedMessage = (String) decryptMethod.invoke(message);
 
-                        if(encryptedMessage.equals("time is over 30 seconds")){
+                        if (encryptedMessage.equals("time is over 30 seconds")) {
                             System.err.println("Calculation took to long");
                             return "cracking encrypted method \"" + message + "\" failed";
-                        }else {
+                        } else {
                             return encryptedMessage;
                         }
                     } catch (final Exception e) {
@@ -152,11 +161,10 @@ public class AppForGUI {
                         System.out.println(file.getName());
 
 
-
-                        if(encryptedMessage.equals("time is over 30 seconds")){
+                        if (encryptedMessage.equals("time is over 30 seconds")) {
                             System.err.println("Calculation took to long");
                             return "cracking encrypted method \"" + message + "\" failed";
-                        }else {
+                        } else {
                             return encryptedMessage;
                         }
                     } catch (Exception e) {
@@ -167,38 +175,120 @@ public class AppForGUI {
             case "register":
                 startSession();
                 String[] inputStrings = input.split(" ");
-                String participantName = inputStrings[2];
-                String typeString = inputStrings[inputStrings.length - 1];
-
-                Query query = session.createQuery("from Participant WHERE name = " + participantName);
-//                if (query.list().get(0) == null) {
-                    //TODO put to db
-                    Type type = new Type(typeString);
-                    session.save(type);
-                    Participant participant = new Participant(participantName, type);
-                    session.save(participant);
-//                    Postbox postbox = new Postbox();
-//                    session.save(postbox);
-                    result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
-//                } else {
-//                    result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
-//                }
+                if (inputStrings.length == 6) {
+                    String participantName = inputStrings[2];
+                    String typeString = inputStrings[inputStrings.length - 1];
+                    Query query = session.createQuery("from Participant P WHERE P.name = :participantName");
+                    query.setParameter("participantName", participantName);
+                    List resultList = query.list();
+                    if (resultList.isEmpty()) {
+                        query = session.createQuery("from Type T WHERE T.name = :typeString");
+                        query.setParameter("typeString", typeString);
+                        resultList = query.list();
+                        Type type = null;
+                        if (resultList.isEmpty()) {
+                            type = new Type(typeString);
+                            session.save(type);
+                        } else {
+                            type = (Type) resultList.get(0);
+                        }
+                        Participant participant = new Participant(participantName, type);
+                        session.save(participant);
+                        Postbox postbox = new Postbox(participant);
+                        session.save(postbox);
+                        result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
+                    } else {
+                        result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
+                    }
+                }
                 endSession();
                 break;
             case "create":
+                startSession();
+                Query query = null;
+                ArrayList<Participant> participants = new ArrayList<>();
+                inputStrings = input.split(" ");
+                System.out.println(inputStrings.length);
+                if (inputStrings.length == 8) {
+                    String channelName = inputStrings[2];
+                    String participantName1 = inputStrings[5];
+                    String participantName2 = inputStrings[7];
+                    tryToAddParticipantToList(participants, participantName1);
+                    tryToAddParticipantToList(participants, participantName2);
+                    if (participants.size() == 2) {
+                        if (participants.get(0).equals(participants.get(1))) {
+                            result = participantName1 + " and " + participantName2 + " are identical – cannot create channel on itself";
+                        } else {
+                            query = session.createQuery("from Channel C WHERE C.name = :channelName");
+                            query.setParameter("channelName", channelName);
+                            if (query.list().isEmpty()) {
+
+                                query = session.createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
+                                query.setParameter("participant1", participants.get(0));
+                                query.setParameter("participant2", participants.get(1));
+                                List query1List = query.list();
+
+                                query = session.createQuery("from Channel C WHERE C.participant1 = :participant2 AND C.participant2 = :participant1");
+                                query.setParameter("participant1", participants.get(0));
+                                query.setParameter("participant2", participants.get(1));
+                                List query2List = query.list();
+
+                                if (query1List.isEmpty() && query2List.isEmpty()) {
+                                    Channel channel = new Channel(channelName, participants.get(0), participants.get(1));
+                                    session.save(channel);
+                                    result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
+                                } else {
+                                    result = "communication channel between " + participantName1 + " and " + participantName2 + " already exists";
+                                }
+                            } else {
+                                result = "channel " + channelName + " already exists";
+                            }
+                        }
+                    }
+                }
+                endSession();
                 break;
             case "show":
                 break;
             case "drop":
                 break;
             case "intrude":
+                startSession();
+                query = null;
+                inputStrings = input.split(" ");
+                String channelName = inputStrings[2];
+                String participantName = inputStrings[4];
+                query = session.createQuery("from Channel C WHERE C.name = :channelName");
+                query.setParameter("channelName", channelName);
+                if (!query.list().isEmpty()) {
+                    Type type = null;
+                    query = session.createQuery("from Type T WHERE T.name = :typeString");
+                    query.setParameter("typeString", "intruder");
+                    if (query.list().isEmpty()) {
+                        type = new Type("intruder");
+                        session.save(type);
+                    } else {
+                        type = (Type) query.list().get(0);
+                    }
+                    Participant participant = new Participant(participantName, type);
+                }
+                System.out.println(inputStrings.length);
                 break;
             case "send":
                 break;
             default:
-                throw new RuntimeException("invalid command, please check your input");
+                result = "invalid command, please check your input";
         }
         return result;
+    }
+
+    private void tryToAddParticipantToList(ArrayList<Participant> participants, String participantName) {
+        Query query = session.createQuery("From Participant P WHERE P.name = :participantName");
+        query.setParameter("participantName", participantName);
+        System.out.println("yeah");
+        if (!query.list().isEmpty()) {
+            participants.add((Participant) query.list().get(0));
+        }
     }
 
     private void startSession() {
