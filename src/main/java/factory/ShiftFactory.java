@@ -8,7 +8,7 @@ import java.net.URLClassLoader;
 
 public class ShiftFactory {
     public static Object build() {
-        if (Checker.isComponentAccepted("components/rsa/rsa_cracker/build/libs/shift.jar")) {
+        if (Checker.isComponentAccepted("components/shift/shift/shift.jar")) {
 
             Object ShiftPort = null;
 
