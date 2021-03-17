@@ -356,7 +356,8 @@ public class AppForGUI {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < showChannelQuery.list().size(); i++) {
-            stringBuilder.append(showChannelQuery.list().get(i));
+            Channel channel = (Channel) showChannelQuery.list().get(i);
+            stringBuilder.append(channel.getName());
             stringBuilder.append(Configuration.instance.lineSeparator);
         }
         System.out.println(stringBuilder.toString());
