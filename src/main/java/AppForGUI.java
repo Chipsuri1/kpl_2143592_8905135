@@ -263,10 +263,10 @@ public class AppForGUI {
 
     private String intrude(String input) {
         startSession();
-        String result = null;
+        String result;
         boolean successful = false;
         Participant participant = null;
-        Query query = null;
+        Query query;
         String[] inputStrings = input.split(" ");
         String channelName = inputStrings[2];
         String participantName = inputStrings[4];
