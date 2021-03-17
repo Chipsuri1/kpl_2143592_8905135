@@ -82,6 +82,4 @@ public class Shift {
             return innerDecrypt(encryptedText, keyfile);
         }
     }
-
-
 }

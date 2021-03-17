@@ -1,4 +1,3 @@
-import java.lang.module.Configuration;
 import java.text.DecimalFormat;
 
 public class ShiftCracker {
@@ -128,7 +127,6 @@ public class ShiftCracker {
     public static ShiftCracker getInstance() {
         return instance;
     }
-
 
     public class Port implements IShiftCracker{
         public String decrypt(String encryptedMessage){

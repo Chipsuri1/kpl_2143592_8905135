@@ -105,8 +105,8 @@ public class RSACracker {
                 return new Key(n, e);
             }else if(keyFile.getName().contains("privateKey")){
 
-                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("n").getAsString());
-                BigInteger d = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("d").getAsString());
+                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("privateKey").get("n").getAsString());
+                BigInteger d = new BigInteger(jsonObject.getAsJsonObject("privateKey").get("d").getAsString());
 
                 return new Key(n, d);
             }else {
@@ -120,7 +120,6 @@ public class RSACracker {
         }
     }
 
-
     public static RSACracker getInstance(){
         return instance;
     }
@@ -131,5 +130,4 @@ public class RSACracker {
             return innerDecrypt(encryptedMessage, publicKeyFile);
         }
     }
-
 }

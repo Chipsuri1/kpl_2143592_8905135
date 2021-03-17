@@ -23,16 +23,28 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-//        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
 //
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
-//        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-
-//        app.executeCommands("encrypt message "y" using rsa and keyfile publicKeyfile.json");
-//        app.executeCommands("decrypt message "ANQ=" using rsa and keyfile privateKeyfile.json");
-//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
-//        app.executeCommands("decrypt message "~zmz" using shift and keyfile keyfile.json");
+//
+//        app.executeCommands("register participant branch_hkg with type normal");
+//        app.executeCommands("register participant branch_cpt with type normal");
+//        app.executeCommands("register participant branch_sfo with type normal");
+//        app.executeCommands("register participant branch_syd with type normal");
+//        app.executeCommands("register participant branch_wuh with type normal");
+//        app.executeCommands("register participant branch_sfo with type normal");
+//        app.executeCommands("register participant msa with type intruder");
+//
+//        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
+//        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+//        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+////        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+//
+//        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
+//        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
+//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
+//        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
 
 //        Transaction transaction = null;
 //        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -228,21 +240,13 @@ public class AppForGUI {
                 endSession();
                 break;
             case "show":
+                result = showChannel();
+                endSession();
                 break;
             case "drop":
-                startSession();
-                inputStrings = input.split("channel ");
-                String channelNameDropQuery = inputStrings[1];
-                Query queryDropChannel = session.createQuery("from Channel C where C.name = :channelName");
-                queryDropChannel.setParameter("channelName", channelNameDropQuery);
-                Channel channel = (Channel) queryDropChannel.list().get(0);
-
-                session.delete(channel);
-                if (queryDropChannel.list().isEmpty()) {
-                    return "unknown channel " + channelNameDropQuery;
-                } else {
-                    return "channel " + channelNameDropQuery + " deleted";
-                }
+                result = dropChannel(input);
+                endSession();
+                break;
             case "intrude":
                 startSession();
                 query = null;
@@ -281,41 +285,83 @@ public class AppForGUI {
     }
 
     private String crackEncryptedMessage(boolean shift, boolean rsa, String message, File file) {
-        Object cracker;
-
         if (shift) {
-            cracker = ShiftCrackerFactory.build();
-            try {
-                Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
-                String encryptedMessage = (String) decryptMethod.invoke(cracker, message);
-
-                if (encryptedMessage.equals("time is over 30 seconds")) {
-                    System.err.println("Calculation took to long");
-                    return "cracking encrypted method \"" + message + "\" failed";
-                } else {
-                    return encryptedMessage;
-                }
-            } catch (final Exception e) {
-                e.printStackTrace();
-            }
-
+            return crackEncryptedMessageShift(message);
         } else if (rsa) {
-            cracker = RSACrackerFactory.build();
-            try {
-                Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                String encryptedMessage = (String) decryptMethod.invoke(cracker, message, file);
-
-                if (encryptedMessage.equals("time is over 30 seconds")) {
-                    System.err.println("Calculation took to long");
-                    return "cracking encrypted method \"" + message + "\" failed";
-                } else {
-                    return encryptedMessage;
-                }
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
+            return crackEncryptedMessageRSA(message, file);
         }
         return null;
+    }
+
+    private String crackEncryptedMessageRSA(String message, File file){
+        Object cracker = RSACrackerFactory.build();
+        try {
+            Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+            String[] inputs = message.split(" ");
+
+            StringBuilder stringBuilder = new StringBuilder();
+            for (int i = 0; i < inputs.length; i++) {
+                stringBuilder.append((String) decryptMethod.invoke(cracker, inputs[i], file));
+            }
+            String encryptedMessage = stringBuilder.toString();
+
+            if (encryptedMessage.contains("time is over 30 seconds")) {
+                System.err.println("Calculation took to long");
+                return "cracking encrypted method \"" + message + "\" failed";
+            } else {
+                return encryptedMessage;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+    private String crackEncryptedMessageShift(String message){
+        Object cracker = ShiftCrackerFactory.build();
+        try {
+            Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
+            String encryptedMessage = (String) decryptMethod.invoke(cracker, message);
+
+            if (encryptedMessage.equals("time is over 30 seconds")) {
+                System.err.println("Calculation took to long");
+                return "cracking encrypted method \"" + message + "\" failed";
+            } else {
+                return encryptedMessage;
+            }
+        } catch (final Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    private String dropChannel(String input){
+        startSession();
+        String[] inputStrings = input.split("channel ");
+        String channelNameDropQuery = inputStrings[1];
+        Query queryDropChannel = session.createQuery("from Channel C where C.name = :channelName");
+        queryDropChannel.setParameter("channelName", channelNameDropQuery);
+        Channel channel = (Channel) queryDropChannel.list().get(0);
+
+        session.delete(channel);
+        if(queryDropChannel.list().isEmpty()){
+            return "unknown channel " + channelNameDropQuery;
+        }else{
+            return "channel " + channelNameDropQuery + " deleted";
+        }
+    }
+
+    private String showChannel(){
+        startSession();
+        Query showChannelQuery = session.createQuery("FROM Channel");
+
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < showChannelQuery.list().size(); i++) {
+            stringBuilder.append(showChannelQuery.list().get(i));
+            stringBuilder.append(Configuration.instance.lineSeparator);
+        }
+        System.out.println(stringBuilder.toString());
+
+        return stringBuilder.toString();
     }
 
 

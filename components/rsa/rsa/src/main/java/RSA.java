@@ -29,7 +29,6 @@ public class RSA {
         return Base64.getEncoder().encodeToString(crypt(new BigInteger(bytes), key).toByteArray());
     }
 
-
     public String innerDecrypt(String encryptedMessage, File privateKeyfile) {
         Key key = getKey(privateKeyfile);
         byte[] msg = new BigInteger(Base64.getDecoder().decode(encryptedMessage)).modPow(key.getE(), key.getN()).toByteArray();
