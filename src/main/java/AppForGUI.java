@@ -24,7 +24,10 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-        app.executeCommands("crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("crack encrypted message \"rtwumjzx\" using shift");
+
+        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
+        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
 
 
 //        Transaction transaction = null;
@@ -125,45 +128,7 @@ public class AppForGUI {
                 }
                 break;
             case "crack":
-                Object cracker;
-
-                if (shift) {
-                    cracker = ShiftCrackerFactory.build();
-                    try {
-                        Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
-                        String encryptedMessage = (String) decryptMethod.invoke(message);
-
-                        if(encryptedMessage.equals("time is over 30 seconds")){
-                            System.err.println("Calculation took to long");
-                            return "cracking encrypted method \"" + message + "\" failed";
-                        }else {
-                            return encryptedMessage;
-                        }
-                    } catch (final Exception e) {
-                        e.printStackTrace();
-                    }
-
-                } else if (rsa) {
-                    cracker = RSACrackerFactory.build();
-                    try {
-                        Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-
-                        String encryptedMessage = (String) decryptMethod.invoke(decryptMethod, message, file);
-                        System.out.println(file.getName());
-
-
-
-                        if(encryptedMessage.equals("time is over 30 seconds")){
-                            System.err.println("Calculation took to long");
-                            return "cracking encrypted method \"" + message + "\" failed";
-                        }else {
-                            return encryptedMessage;
-                        }
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }
-                break;
+                return crackEncryptedMessage(shift, rsa, message, file);
             case "register":
                 startSession();
                 String[] inputStrings = input.split(" ");
@@ -200,6 +165,45 @@ public class AppForGUI {
         }
         return result;
     }
+
+    private String crackEncryptedMessage(boolean shift, boolean rsa, String message, File file){
+        Object cracker;
+
+        if (shift) {
+            cracker = ShiftCrackerFactory.build();
+            try {
+                Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
+                String encryptedMessage = (String) decryptMethod.invoke(cracker, message);
+
+                if(encryptedMessage.equals("time is over 30 seconds")){
+                    System.err.println("Calculation took to long");
+                    return "cracking encrypted method \"" + message + "\" failed";
+                }else {
+                    return encryptedMessage;
+                }
+            } catch (final Exception e) {
+                e.printStackTrace();
+            }
+
+        } else if (rsa) {
+            cracker = RSACrackerFactory.build();
+            try {
+                Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                String encryptedMessage = (String) decryptMethod.invoke(cracker, message, file);
+
+                if(encryptedMessage.equals("time is over 30 seconds")){
+                    System.err.println("Calculation took to long");
+                    return "cracking encrypted method \"" + message + "\" failed";
+                }else {
+                    return encryptedMessage;
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+        return null;
+    }
+
 
     private void startSession() {
         sessionFactory = HibernateUtility.getSessionFactory();

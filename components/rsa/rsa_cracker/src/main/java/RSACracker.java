@@ -1,5 +1,13 @@
+import com.google.gson.JsonObject;
+import com.google.gson.JsonParser;
+
 import java.io.File;
+import java.io.FileReader;
+import java.io.IOException;
 import java.math.BigInteger;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.Base64;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -13,11 +21,14 @@ public class RSACracker {
     }
 
     public String innerDecrypt(String cipher, File publicKeyfile){
-        Key key = Key.getKey(publicKeyfile);
+        Key key = getKey(publicKeyfile);
+        System.out.println("D:");
 
         try {
             BigInteger p, q, d;
             List<BigInteger> factorList = factorize(key.getN());
+
+            System.out.println("D2:");
 
             if(factorList == null){
                 return "time is over 30 seconds";
@@ -30,8 +41,9 @@ public class RSACracker {
             q = factorList.get(1);
             BigInteger phi = (p.subtract(BigInteger.ONE)).multiply(q.subtract(BigInteger.ONE));
             d = key.getE().modInverse(phi);
+            System.out.println("D:" + d);
 
-            return decrypt(cipher, new Key(key.getN(), d));
+            return decrypt(Base64.getDecoder().decode(cipher), new Key(key.getN(), d));
         }catch (Exception exception){
             throw new RuntimeException(exception.getMessage());
         }
@@ -72,10 +84,45 @@ public class RSACracker {
         return factorList;
     }
 
-    public String decrypt(String encryptedMessage, Key key) {
-        byte[] msg = new BigInteger(encryptedMessage.getBytes()).modPow(key.getE(), key.getN()).toByteArray();
+    public String decrypt(byte[] encryptedMessage, Key key) {
+        byte[] msg = new BigInteger(encryptedMessage).modPow(key.getE(), key.getN()).toByteArray();
+        System.out.println(new String(msg));
         return new String(msg);
     }
+
+    public Key getKey(File keyFile) {
+        String json = null;
+        try {
+            json = new String(Files.readAllBytes(Paths.get(String.valueOf(keyFile))));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
+
+        try {
+            if(keyFile.getName().contains("publicKey")){
+
+                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("n").getAsString());
+                BigInteger e = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("e").getAsString());
+
+                return new Key(n, e);
+            }else if(keyFile.getName().contains("privateKey")){
+
+                BigInteger n = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("n").getAsString());
+                BigInteger d = new BigInteger(jsonObject.getAsJsonObject("publicKey").get("d").getAsString());
+
+                return new Key(n, d);
+            }else {
+                System.out.println("invalid file");
+                return null;
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 
     public static RSACracker getInstance(){
         return instance;

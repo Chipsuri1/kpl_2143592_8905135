@@ -8,6 +8,7 @@ version '1.0'
 
 repositories {
     mavenCentral()
+    jcenter()
 }
 
 javafx {
@@ -17,12 +18,9 @@ javafx {
 
 dependencies {
     implementation group: 'org.hsqldb', name: 'hsqldb', version: '2.5.1'
-    //Müllis projekt war so
-    //runtimeOnly("org.hsqldb:hsqldb:2.5.1")
     implementation("com.google.guava:guava:30.1-jre")
-    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.7.1'
-    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine'
-    compile 'org.hibernate:hibernate-core:5.4.27.Final'
+    implementation group: 'com.google.code.gson', name: 'gson', version: '2.8.6'
+    implementation 'org.hibernate:hibernate-core:5.4.27.Final'
 }
 
 compileJava {
@@ -43,8 +41,4 @@ run {
                 '--add-modules', 'javafx.controls,javafx.fxml'
         ]
     }
-}
-
-test {
-    useJUnitPlatform()
 }

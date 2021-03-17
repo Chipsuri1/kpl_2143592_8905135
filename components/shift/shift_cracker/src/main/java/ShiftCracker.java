@@ -14,6 +14,8 @@ public class ShiftCracker {
 
     // rtwumjzx
     public String innerDecrypt(String encryptedMessage) {
+        long unixTimeStart = System.currentTimeMillis() / 1000L;
+        encryptedMessage = encryptedMessage.toUpperCase();
 
         if (encryptedMessage.equals("")) {
             System.exit(0);
@@ -40,8 +42,18 @@ public class ShiftCracker {
         StringBuilder stringBuilder = new StringBuilder();
 
         for (int shift = 1; shift <= 25; shift++) {
-            stringBuilder.append(smartShift(shift, unicode, unicodeCopy));
-            stringBuilder.append(System.getProperty("line.separator"));
+            long unixTimeStampNow = System.currentTimeMillis() / 1000L;
+
+            if(unixTimeStampNow - unixTimeStart >= 30){
+                return "time is over 30 seconds";
+            }
+
+            String output = smartShift(shift, unicode, unicodeCopy);
+
+            if(output != null){
+                stringBuilder.append("Reshift: " + shift + " " + output);
+                stringBuilder.append(System.getProperty("line.separator"));
+            }
         }
 
         return stringBuilder.toString();
@@ -108,7 +120,7 @@ public class ShiftCracker {
 
         if (eFrequency / frequency >= 0.05 || aFrequency / frequency >= 0.05 || iFrequency / frequency >= 0.05 || oFrequency / frequency >= 0.05 || uFrequency / frequency >= 0.05) {
             return stringBuilder.toString();
-        }else{
+        }else {
             return null;
         }
     }
