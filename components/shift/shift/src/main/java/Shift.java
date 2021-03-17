@@ -53,7 +53,7 @@ public class Shift {
         JsonObject jsonObject = new JsonParser().parse(json).getAsJsonObject();
 
         try {
-            if (keyFile.getName().contains("keyFile")) {
+            if (keyFile.getName().contains("keyfile")) {
 
                 Integer n = jsonObject.get("key").getAsInt();
 

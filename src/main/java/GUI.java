@@ -26,8 +26,8 @@ public class GUI extends Application{
     }
 
     public void start(Stage primaryStage) {
-        //Using Mülli db zeug
         HSQLDB.instance.setupDatabase();
+        application.setupData();
         primaryStage.setTitle("MSA | Mergentheim/Mosbach Security Agency");
 
         HBox hBox = new HBox();

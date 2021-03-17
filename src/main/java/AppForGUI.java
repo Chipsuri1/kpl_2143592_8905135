@@ -27,24 +27,12 @@ public class AppForGUI {
 //
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
-//
-//        app.executeCommands("register participant branch_hkg with type normal");
-//        app.executeCommands("register participant branch_cpt with type normal");
-//        app.executeCommands("register participant branch_sfo with type normal");
-//        app.executeCommands("register participant branch_syd with type normal");
-//        app.executeCommands("register participant branch_wuh with type normal");
-//        app.executeCommands("register participant branch_sfo with type normal");
-//        app.executeCommands("register participant msa with type intruder");
-//
-//        app.executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
-//        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
-//        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
-////        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-//
-//        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
-        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
-//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
-//        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
+//        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+
+//        app.executeCommands("encrypt message "y" using rsa and keyfile publicKeyfile.json");
+//        app.executeCommands("decrypt message "ANQ=" using rsa and keyfile privateKeyfile.json");
+//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
+//        app.executeCommands("decrypt message "~zmz" using shift and keyfile keyfile.json");
 
 //        Transaction transaction = null;
 //        try (Session session = HibernateUtil.getSessionFactory().openSession()) {
@@ -86,7 +74,7 @@ public class AppForGUI {
             rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
         }
         if (input.contains("keyfile")) {
-            dataPath = "configuration/" + input.split("keyfile")[1].substring(1);
+            dataPath = "configuration/" + input.split("keyfile", 2)[1].substring(1);
             file = new File(dataPath);
         }
 
@@ -96,21 +84,29 @@ public class AppForGUI {
                 if (shift) {
                     algorithm = "shift";
                     encryptor = ShiftFactory.build();
+                    try {
+                        Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
+                        result = (String) encryptMethod.invoke(encryptor, message, file);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 } else if (rsa) {
                     algorithm = "rsa";
                     encryptor = RSAFactory.build();
-                }
-                try {
-                    Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
-                    result = (String) encryptMethod.invoke(encryptor, message, file);
+                    try {
+                        String[] inputStrings = message.split("");
+                        Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int i = 0; i < inputStrings.length; i++) {
+                            stringBuilder.append(encryptMethod.invoke(encryptor, inputStrings[i], file) + " ");
+                        }
+                        result = stringBuilder.toString();
 
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
+
                 if (Configuration.instance.debugMode) {
                     LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
                     LogEngine.instance.writeLn("Command: " + command + ", algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
@@ -122,22 +118,32 @@ public class AppForGUI {
                 if (shift) {
                     algorithm = "shift";
                     decrypter = ShiftFactory.build();
+                    try {
+                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                        result = (String) decryptMethod.invoke(decrypter, message, file);
+
+                        System.out.println(result);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 } else if (rsa) {
                     algorithm = "rsa";
                     decrypter = RSAFactory.build();
-                }
-                try {
-                    Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                    result = (String) decryptMethod.invoke(decrypter, message, file);
+                    String[] inputs = message.split(" ");
+                    try {
+                        Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
+                        StringBuilder stringBuilder = new StringBuilder();
+                        for (int i = 0; i < inputs.length; i++) {
+                            stringBuilder.append((String) decryptMethod.invoke(decrypter, inputs[i], file));
+                        }
+                        result = stringBuilder.toString();
 
-                    System.out.println(result);
-                } catch (NoSuchMethodException e) {
-                    e.printStackTrace();
-                } catch (IllegalAccessException e) {
-                    e.printStackTrace();
-                } catch (InvocationTargetException e) {
-                    e.printStackTrace();
+                        System.out.println(result);
+                    } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
+                        e.printStackTrace();
+                    }
                 }
+
                 if (Configuration.instance.debugMode) {
                     LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
                     LogEngine.instance.writeLn("Command: " + command + ", Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
@@ -232,9 +238,9 @@ public class AppForGUI {
                 Channel channel = (Channel) queryDropChannel.list().get(0);
 
                 session.delete(channel);
-                if(queryDropChannel.list().isEmpty()){
+                if (queryDropChannel.list().isEmpty()) {
                     return "unknown channel " + channelNameDropQuery;
-                }else{
+                } else {
                     return "channel " + channelNameDropQuery + " deleted";
                 }
             case "intrude":
@@ -274,7 +280,7 @@ public class AppForGUI {
         }
     }
 
-    private String crackEncryptedMessage(boolean shift, boolean rsa, String message, File file){
+    private String crackEncryptedMessage(boolean shift, boolean rsa, String message, File file) {
         Object cracker;
 
         if (shift) {
@@ -283,10 +289,10 @@ public class AppForGUI {
                 Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
                 String encryptedMessage = (String) decryptMethod.invoke(cracker, message);
 
-                if(encryptedMessage.equals("time is over 30 seconds")){
+                if (encryptedMessage.equals("time is over 30 seconds")) {
                     System.err.println("Calculation took to long");
                     return "cracking encrypted method \"" + message + "\" failed";
-                }else {
+                } else {
                     return encryptedMessage;
                 }
             } catch (final Exception e) {
@@ -299,10 +305,10 @@ public class AppForGUI {
                 Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
                 String encryptedMessage = (String) decryptMethod.invoke(cracker, message, file);
 
-                if(encryptedMessage.equals("time is over 30 seconds")){
+                if (encryptedMessage.equals("time is over 30 seconds")) {
                     System.err.println("Calculation took to long");
                     return "cracking encrypted method \"" + message + "\" failed";
-                }else {
+                } else {
                     return encryptedMessage;
                 }
             } catch (Exception e) {
@@ -323,4 +329,16 @@ public class AppForGUI {
         session.getTransaction().commit();
     }
 
+    public void setupData() {
+        executeCommands("register participant branch_hkg with type normal");
+        executeCommands("register participant branch_cpt with type normal");
+        executeCommands("register participant branch_sfo with type normal");
+        executeCommands("register participant branch_syd with type normal");
+        executeCommands("register participant branch_wuh with type normal");
+        executeCommands("register participant branch_sfo with type normal");
+        executeCommands("register participant msa with type intruder");
+        executeCommands("create channel hkg_wuh  from branch_hkg to branch_wuh");
+        executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+        executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+    }
 }
