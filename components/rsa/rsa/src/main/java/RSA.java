@@ -29,10 +29,10 @@ public class RSA {
         return Base64.getEncoder().encodeToString(crypt(new BigInteger(bytes), key).toByteArray());
     }
 
+
     public String innerDecrypt(String encryptedMessage, File privateKeyfile) {
         Key key = getKey(privateKeyfile);
-
-        byte[] msg = crypt(new BigInteger(encryptedMessage.getBytes()), key).toByteArray();
+        byte[] msg = new BigInteger(encryptedMessage.getBytes()).modPow(key.getE(), key.getN()).toByteArray();
         return new String(msg);
     }
 
