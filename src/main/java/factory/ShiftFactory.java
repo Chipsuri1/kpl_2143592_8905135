@@ -8,7 +8,7 @@ import java.net.URLClassLoader;
 
 public class ShiftFactory {
     public static Object build() {
-//        if (Checker.isComponentAccepted("components/shift/shift/shift.jar")) {
+        if (Checker.isComponentAccepted("components/shift/shift/shift.jar")) {
 
             Object ShiftPort = null;
 
@@ -25,9 +25,9 @@ public class ShiftFactory {
             }
 
             return ShiftPort;
-//        }else {
-//            return null;
-//        }
+        }else {
+            return null;
+        }
     }
 }
 

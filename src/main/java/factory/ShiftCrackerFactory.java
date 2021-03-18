@@ -8,7 +8,7 @@ import java.net.URLClassLoader;
 
 public class ShiftCrackerFactory {
     public static Object build() {
-//        if (Checker.isComponentAccepted("components/shift/shift_cracker/shift_cracker.jar")) {
+        if (Checker.isComponentAccepted("components/shift/shift_cracker/shift_cracker.jar")) {
 
             Object ShiftCrackerPort = null;
 
@@ -25,9 +25,9 @@ public class ShiftCrackerFactory {
             }
 
             return ShiftCrackerPort;
-//        }else {
-//            return null;
-//        }
+        }else {
+            return null;
+        }
     }
 }
 
