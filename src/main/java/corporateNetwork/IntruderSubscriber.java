@@ -13,7 +13,6 @@ public class IntruderSubscriber extends ParticipantSubscriber {
 
     @Subscribe
     public void receive(MessageEvent event){
-        event.getApp().startSession();
         org.hibernate.query.Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
         queryGetParticipant.setParameter("name", name);
         Participant participant = (Participant) queryGetParticipant.list().get(0);
