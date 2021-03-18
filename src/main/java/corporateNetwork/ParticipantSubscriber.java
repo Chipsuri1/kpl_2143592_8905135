@@ -1,10 +1,8 @@
 package corporateNetwork;
 
 import com.google.common.eventbus.Subscribe;
-import entitys.Postbox;
 import event.MessageEvent;
 import event.Subscriber;
-import org.hibernate.Query;
 
 public class ParticipantSubscriber extends Subscriber {
     protected String name;

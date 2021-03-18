@@ -474,7 +474,7 @@ public class AppForGUI {
 
     private String setMessageToGUI(String input){
         String message = null;
-        message = input.split(" ")[1];
+        message = input.replaceFirst("set ", "");
 
         return message;
     }

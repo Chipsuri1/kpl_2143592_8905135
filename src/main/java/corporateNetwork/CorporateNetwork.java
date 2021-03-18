@@ -272,7 +272,6 @@ public class CorporateNetwork {
                     type = (Type) resultList.get(0);
                 }
 
-                //TODO brauch ich noch die postbox?
                 Participant participant = new Participant(participantName, type);
                 ParticipantSubscriber participantSubscriber = null;
                 if(typeString.equals("normal")){
