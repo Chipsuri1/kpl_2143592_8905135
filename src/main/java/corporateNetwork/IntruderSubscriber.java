@@ -20,7 +20,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
 
         Query queryGetPostbox = event.getApp().getSession().createQuery("from Postbox P WHERE P.participantTo = :participantTo");
         queryGetPostbox.setParameter("participantTo", participant);
-        Postbox postbox = (Postbox) queryGetParticipant.list().get(0);
+        Postbox postbox = (Postbox) queryGetPostbox.list().get(0);
         postbox.setMessage("unknown");
         String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
 

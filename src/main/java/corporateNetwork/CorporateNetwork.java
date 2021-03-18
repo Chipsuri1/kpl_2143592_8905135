@@ -307,19 +307,18 @@ public class CorporateNetwork {
 
         Query query = null;
         ArrayList<Participant> participants = new ArrayList<>();
-        String[] inputStrings = event.getInput().split(" ");
+        String[] inputStrings =  event.getInput().split("\" ")[1].split(" ");
         String participantName1 = null;
         String participantName2 = null;
-        if (inputStrings.length == 11) {
-            participantName1 = inputStrings[4];
-            participantName2 = inputStrings[6];
+        if (inputStrings.length == 9) {
+            participantName1 = inputStrings[1];
+            participantName2 = inputStrings[3];
             app.tryToAddParticipantToList(participants, participantName1);
             app.tryToAddParticipantToList(participants, participantName2);
             if (participants.size() == 2) {
                 if (participants.get(0).equals(participants.get(1))) {
-                    result = "no valid channel from " + participantName1 + " to "+participantName2;
+                    result = "no valid channel from " + participantName1 + " to " + participantName2;
                 } else {
-                    //TODO encrypt ohne anzeigen in der gui am besten encrypterMethode direkt nutzen
                     cipher = app.encrypt(algorithm, event.getMessage(), event.getFile());
 
 
@@ -331,26 +330,23 @@ public class CorporateNetwork {
 
                         entitys.Channel channel = (entitys.Channel) queryList.get(0);
                         corporateNetwork.Channel netWorkChannel = channelHashMap.get(channel.getName());
-                        app.endSession();
 
                         netWorkChannel.post(new MessageEvent(cipher, participantSubscriberHashMap.get(participantName1), participantSubscriberHashMap.get(participantName2), app, algorithm, event.getFile()));
 
-                        app.startSession();
                         query = app.getSession().createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
-                        Algorithm algorithmEntity = (Algorithm)query.list().get(0);
-                        Message messageEntity = new Message(participants.get(0), participants.get(1), event.getMessage(), algorithmEntity, cipher, event.getFile().getName().split("/")[1]);
+                        Algorithm algorithmEntity = (Algorithm) query.list().get(0);
+                        Message messageEntity = new Message(participants.get(0), participants.get(1), event.getMessage(), algorithmEntity, cipher, event.getFile().getName());
                         app.getSession().save(messageEntity);
 
                         result = participantName2 + " received new message";
                     } else {
-                        result = "no valid channel from " + participantName1 + " to "+participantName2;
+                        result = "no valid channel from " + participantName1 + " to " + participantName2;
                     }
                 }
             }
+            app.endSession();
         }
-
-        app.endSession();
         return result;
     }
 

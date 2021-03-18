@@ -113,7 +113,7 @@ public class GUI extends Application{
                         if(result != null){
                             outputArea.setText(result);
                         }else{
-                            System.out.println("Result is null");
+                            outputArea.setText("");
                         }
                         break;
                     case F8:

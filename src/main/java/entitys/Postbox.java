@@ -17,6 +17,10 @@ public class Postbox {
         this.participantTo = participantTo;
     }
 
+    public Postbox(){
+
+    }
+
     @ManyToOne
     @JoinColumn(name = "participant_to_id")
     private Participant participantTo;

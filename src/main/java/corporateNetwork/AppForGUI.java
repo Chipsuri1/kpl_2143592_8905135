@@ -30,6 +30,7 @@ public class AppForGUI {
 
         AppForGUI app = new AppForGUI();
         app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
+        app.setupAlgo();
 
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
@@ -47,9 +48,24 @@ public class AppForGUI {
         app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
 
+        app.executeCommands("register participant branch_hkg with type normal");
+        app.executeCommands("register participant branch_cpt with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant branch_syd with type normal");
+        app.executeCommands("register participant branch_wuh with type normal");
+        app.executeCommands("register participant branch_sfo with type normal");
+        app.executeCommands("register participant msa with type intruder");
+
+        app.executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
+        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+
+
+        app.executeCommands("send message \"187\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
 //        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
 //        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
-//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyFile.json");
+//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
 //        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
     }
 
@@ -206,7 +222,6 @@ public class AppForGUI {
             LogEngine.instance.writeLn("Command: decrypt, Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
             LogEngine.instance.close();
         }
-        endSession();
         return result;
     }
 
@@ -499,6 +514,10 @@ public class AppForGUI {
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+        setupAlgo();
+    }
+
+    public void setupAlgo(){
         startSession();
 
         Algorithm algorithm = new Algorithm("rsa");
