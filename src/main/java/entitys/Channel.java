@@ -9,8 +9,6 @@ import javax.persistence.*;
 @Table(name = "channel")
 public class Channel {
 
-
-    //TODO wo kommt der eventbus rein
     @Id
     @Column(name = "name", unique = true)
     @NotNull

@@ -321,7 +321,8 @@ public class CorporateNetwork {
                     result = "no valid channel from " + participantName1 + " to "+participantName2;
                 } else {
                     //TODO encrypt ohne anzeigen in der gui am besten encrypterMethode direkt nutzen
-                    cipher = app.executeCommands("encrypt message \"" + event.getMessage() + "\" using " + algorithm + " and keyfile " + event.getFile().getName().split("/")[1]);
+                    cipher = app.encrypt(algorithm, event.getMessage(), event.getFile());
+
 
                     query = app.getSession().createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
                     query.setParameter("participant1", participants.get(0));

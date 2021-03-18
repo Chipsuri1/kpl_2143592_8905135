@@ -210,12 +210,10 @@ public class AppForGUI {
         return result;
     }
 
-    private String encrypt(boolean shift, boolean rsa, String message, File file, String command) {
+    public String encrypt(String algorithm, String message, File file) {
         Object encryptor = null;
-        String algorithm = null;
         String result = null;
-        if (shift) {
-            algorithm = "shift";
+        if (algorithm.equals("shift")) {
             encryptor = ShiftFactory.build();
             try {
                 Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
@@ -223,8 +221,7 @@ public class AppForGUI {
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-        } else if (rsa) {
-            algorithm = "rsa";
+        } else if (algorithm.equals("rsa")) {
             encryptor = RSAFactory.build();
             try {
                 String[] inputStrings = message.split("");
@@ -248,7 +245,6 @@ public class AppForGUI {
         endSession();
         return result;
     }
-
 
     private String register(String input) {
         String result = null;

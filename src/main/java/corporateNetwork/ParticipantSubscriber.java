@@ -1,8 +1,11 @@
 package corporateNetwork;
 
 import com.google.common.eventbus.Subscribe;
+import entitys.Participant;
+import entitys.Postbox;
 import event.MessageEvent;
 import event.Subscriber;
+import org.hibernate.query.Query;
 
 public class ParticipantSubscriber extends Subscriber {
     protected String name;
@@ -17,20 +20,20 @@ public class ParticipantSubscriber extends Subscriber {
     public void receive(MessageEvent event) {
         if (event.getParticipantSubscriberTo().equals(this)) {
 
-            //TODO decrypt without gui
             String message = event.getApp().decrypt(event.getAlgorithm(), event.getCipher(), event.getFile());
 
-
-            //TODO postbox eintrag erstellen aber kp ob neu oder ob alt und nur message setzen
             event.getApp().startSession();
-//            Query query = event.getApp().getSession().createQuery("from Postbox P WHERE P.participantTo = :participantTo");
-//            query.setParameter("participantTo", this);
-//            Postbox postbox = (Postbox) query.list().get(0);
-//            postbox.setMessage(message);
+            Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
+            queryGetParticipant.setParameter("name", name);
+            Participant participant = (Participant) queryGetParticipant.list().get(0);
+
+            Query queryGetPostbox = event.getApp().getSession().createQuery("from Postbox P WHERE P.participantTo = :participantTo");
+            queryGetPostbox.setParameter("participantTo", participant);
+            Postbox postbox = (Postbox) queryGetParticipant.list().get(0);
+            postbox.setMessage(message);
             event.getApp().executeCommands("set " + name + " received new message");
         } else {
             System.out.println("This message is not for me!");
         }
-
     }
 }
