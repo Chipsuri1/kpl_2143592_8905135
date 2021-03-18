@@ -126,7 +126,6 @@ public class GUI extends Application{
         });
 
         hBox.getChildren().addAll(executeButton, closeButton);
-
         VBox vbox = new VBox(20);
         vbox.setPadding(new Insets(25, 25, 25, 25));
         vbox.getChildren().addAll(hBox, commandLineArea, outputArea);
@@ -134,7 +133,6 @@ public class GUI extends Application{
         Scene scene = new Scene(vbox, 950, 500);
         primaryStage.setScene(scene);
         primaryStage.show();
-
     }
 
     private String executeCommand(String input){
@@ -142,5 +140,4 @@ public class GUI extends Application{
         System.out.println("Command is executed");
         return result;
     }
-
 }

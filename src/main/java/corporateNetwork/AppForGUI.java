@@ -29,7 +29,7 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-//        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
 
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
@@ -85,6 +85,7 @@ public class AppForGUI {
             case "crack":
                 result = corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
 //                return crackEncryptedMessage(shift, rsa, message, file);
+                break;
             case "register":
                 result = corporateNetwork.receive(new Register(input));
 //                result = register(input);
@@ -169,11 +170,10 @@ public class AppForGUI {
         return result;
     }
 
-    private String decrypt(boolean shift, boolean rsa, String message, File file, String command) {
+    public String decrypt(String algorithm, String message, File file) {
         Object decrypter = null;
-        String algorithm = null;
         String result = null;
-        if (shift) {
+        if (algorithm.equals("shift")) {
             algorithm = "shift";
             decrypter = ShiftFactory.build();
             try {
@@ -184,7 +184,7 @@ public class AppForGUI {
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
-        } else if (rsa) {
+        } else if (algorithm.equals("rsa")) {
             algorithm = "rsa";
             decrypter = RSAFactory.build();
             String[] inputs = message.split(" ");
@@ -202,8 +202,8 @@ public class AppForGUI {
             }
         }
         if (Configuration.instance.debugMode) {
-            LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: " + command + ", Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+            LogEngine.instance.init("decrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+            LogEngine.instance.writeLn("Command: decrypt, Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
             LogEngine.instance.close();
         }
         endSession();
@@ -241,8 +241,8 @@ public class AppForGUI {
         }
 
         if (Configuration.instance.debugMode) {
-            LogEngine.instance.init(command + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: " + command + ", algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
+            LogEngine.instance.init("encrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+            LogEngine.instance.writeLn("Command: encrypt, algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
             LogEngine.instance.close();
         }
         endSession();
@@ -386,13 +386,14 @@ public class AppForGUI {
         }
     }
 
-    private String crackEncryptedMessage(boolean shift, boolean rsa, String message, File file) {
-        if (shift) {
+    public String crackEncryptedMessage(String algorithm, String message, File file) {
+        if (algorithm.equals("shift")) {
             return crackEncryptedMessageShift(message);
-        } else if (rsa) {
+        } else if (algorithm.equals("rsa")) {
             return crackEncryptedMessageRSA(message, file);
+        }else{
+            return "Invalid algorithm. Please try again";
         }
-        return null;
     }
 
     private String crackEncryptedMessageRSA(String message, File file) {
@@ -409,7 +410,7 @@ public class AppForGUI {
 
             if (encryptedMessage.contains("time is over 30 seconds")) {
                 System.err.println("Calculation took to long");
-                return "cracking encrypted method \"" + message + "\" failed";
+                return "cracking encrypted message \"" + message + "\" failed";
             } else {
                 return encryptedMessage;
             }

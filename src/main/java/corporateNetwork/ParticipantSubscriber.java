@@ -18,7 +18,7 @@ public class ParticipantSubscriber extends Subscriber {
         if (event.getParticipantSubscriberTo().equals(this)) {
 
             //TODO decrypt without gui
-            String message = event.getApp().executeCommands("decrypt message \"" + event.getCipher() + "\" using " + event.getAlgorithm() + " and keyfile " + event.getFile().getName().split("/")[1]);
+            String message = event.getApp().decrypt(event.getAlgorithm(), event.getCipher(), event.getFile());
 
 
             //TODO postbox eintrag erstellen aber kp ob neu oder ob alt und nur message setzen

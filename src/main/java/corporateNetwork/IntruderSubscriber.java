@@ -17,14 +17,13 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         query.setParameter("participantTo", this);
         Postbox postbox = (Postbox) query.list().get(0);
         postbox.setMessage("unknown");
-        String message = null;
-        //TODO message = crack
+        String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
 
-        if(message != null){
+        if(message == null || message.equals("Invalid algorithm. Please try again") || message.contains("failed")){
+            event.getApp().executeCommands("set " + "intruder " + name +" | crack message from participant " + event.getParticipantSubscriberFrom().name + " failed");
+        }else {
             postbox.setMessage(message);
             event.getApp().executeCommands("set " + "intruder " + name + " cracked message from participant "+event.getParticipantSubscriberFrom().name + " | " + message);
-        }else {
-            event.getApp().executeCommands("set " + "intruder " + name +" | crack message from participant "+event.getParticipantSubscriberFrom().name + " failed");
         }
     }
 }
