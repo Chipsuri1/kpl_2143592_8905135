@@ -1,5 +1,7 @@
 package factory;
 
+import base.Configuration;
+
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -7,7 +9,7 @@ import java.io.InputStreamReader;
 public class Checker {
     public static boolean isComponentAccepted(String path){
         try {
-            ProcessBuilder processBuilder = new ProcessBuilder("C:\\Program Files\\Java\\jdk-15.0.2\\bin\\jarsigner", "-verify", path);
+            ProcessBuilder processBuilder = new ProcessBuilder(Configuration.instance.pathToJavaJarSigner, "-verify", path);
             Process process = processBuilder.start();
             process.waitFor();
 
