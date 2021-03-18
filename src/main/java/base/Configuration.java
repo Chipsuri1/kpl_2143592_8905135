@@ -10,6 +10,8 @@ public enum Configuration {
     public final String dataDirectory = userDirectory + fileSeparator + "data" + fileSeparator;
     public final String logDirectory = userDirectory + fileSeparator + "log" + fileSeparator;
 
+    public final String pathToJavaJarSigner = "C:\\Program Files\\Java\\jdk-15.0.2\\bin\\jarsigner";
+
     public final String commonPathToJavaArchive = userDirectory + fileSeparator + "components" + fileSeparator;
 
     public final String inputDataFile = dataDirectory + fileSeparator + "input.txt";
