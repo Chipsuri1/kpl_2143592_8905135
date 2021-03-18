@@ -31,4 +31,16 @@ public class Postbox {
 
     @Column(name = "timestamp")
     private Integer timestamp;
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
+
+    public void setParticipantFrom(Participant participantFrom) {
+        this.participantFrom = participantFrom;
+    }
+
+    public void setTimestamp(Integer timestamp) {
+        this.timestamp = timestamp;
+    }
 }

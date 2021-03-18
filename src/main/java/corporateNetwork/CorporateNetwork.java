@@ -5,6 +5,7 @@ import base.LogEngine;
 import com.google.common.eventbus.EventBus;
 import entitys.*;
 import entitys.Channel;
+import entitys.Message;
 import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
@@ -16,16 +17,25 @@ import java.io.File;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
 
 public class CorporateNetwork {
 
     private EventBus eventBus;
     private AppForGUI app;
+    private HashMap<String, ParticipantSubscriber> participantSubscriberHashMap;
+    private HashMap<String, corporateNetwork.Channel> channelHashMap;
 
     public CorporateNetwork(AppForGUI app) {
         this.app = app;
         eventBus = new EventBus();
+        participantSubscriberHashMap = new HashMap<>();
+        channelHashMap = new HashMap<>();
+    }
+
+    public void post(Object object) {
+        eventBus.post(object);
     }
 
     public EventBus getEventBus() {
@@ -196,7 +206,12 @@ public class CorporateNetwork {
                         List query2List = query.list();
 
                         if (query1List.isEmpty() && query2List.isEmpty()) {
-                            entitys.Channel channel = new entitys.Channel(channelName, participants.get(0), participants.get(1));
+                            Channel channel = new entitys.Channel(channelName, participants.get(0), participants.get(1));
+                            ParticipantSubscriber participantSubscriber1 = participantSubscriberHashMap.get(participantName1);
+                            ParticipantSubscriber participantSubscriber2 = participantSubscriberHashMap.get(participantName2);
+                            corporateNetwork.Channel channelOfNetwork = new corporateNetwork.Channel(channelName, participantSubscriber1, participantSubscriber2);
+                            channelHashMap.put(channelName, channelOfNetwork);
+
                             app.getSession().save(channel);
                             result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
                         } else {
@@ -214,7 +229,7 @@ public class CorporateNetwork {
 
     public String receive(Intrude event) {
         app.startSession();
-        String result;
+        String result = null;
         boolean successful = false;
         Participant participant = null;
         Query query;
@@ -225,21 +240,11 @@ public class CorporateNetwork {
         query = app.getSession().createQuery("from Channel C WHERE C.name = :channelName");
         query.setParameter("channelName", channelName);
         if (!query.list().isEmpty()) {
-
-            Type type = null;
-            query = app.getSession().createQuery("from Type T WHERE T.name = :typeString");
-            query.setParameter("typeString", "intruder");
-            type = (Type) query.list().get(0);
-            query = app.getSession().createQuery("from Participant P WHERE P.type = :type");
-            query.setParameter("type", type);
-            participant = (Participant) query.list().get(0);
-
+            corporateNetwork.Channel channel = channelHashMap.get(channelName);
+            IntruderSubscriber intruderSubscriber = (IntruderSubscriber) participantSubscriberHashMap.get(participantName);
+            channel.getEventBus().register(intruderSubscriber);
         }
-        if (successful) {
-            result = "intruder " + participant.getName() + " cracked message from participant [name] | [message]";
-        } else {
-            result = "intruder [name] | crack message from participant [name] failed";
-        }
+
         app.endSession();
         return result;
     }
@@ -266,7 +271,19 @@ public class CorporateNetwork {
                 } else {
                     type = (Type) resultList.get(0);
                 }
+
+                //TODO brauch ich noch die postbox?
                 Participant participant = new Participant(participantName, type);
+                ParticipantSubscriber participantSubscriber = null;
+                if(typeString.equals("normal")){
+                    participantSubscriber = new ParticipantSubscriber(participantName, typeString);
+                }else {
+                    participantSubscriber = new IntruderSubscriber(participantName, typeString);
+                }
+
+                participantSubscriberHashMap.put(participantName, participantSubscriber);
+                eventBus.register(participantSubscriber);
+
                 app.getSession().save(participant);
                 Postbox postbox = new Postbox(participant);
                 app.getSession().save(postbox);
@@ -304,6 +321,7 @@ public class CorporateNetwork {
                 if (participants.get(0).equals(participants.get(1))) {
                     result = "no valid channel from " + participantName1 + " to "+participantName2;
                 } else {
+                    //TODO encrypt ohne anzeigen in der gui am besten encrypterMethode direkt nutzen
                     cipher = app.executeCommands("encrypt message \"" + event.getMessage() + "\" using " + algorithm + " and keyfile " + event.getFile().getName().split("/")[1]);
 
                     query = app.getSession().createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
@@ -311,15 +329,20 @@ public class CorporateNetwork {
                     query.setParameter("participant2", participants.get(1));
                     List queryList = query.list();
                     if (!queryList.isEmpty()) {
-                        entitys.Channel channel = (entitys.Channel) queryList.get(0);
 
+                        entitys.Channel channel = (entitys.Channel) queryList.get(0);
+                        corporateNetwork.Channel netWorkChannel = channelHashMap.get(channel.getName());
+                        app.endSession();
+
+                        netWorkChannel.post(new MessageEvent(cipher, participantSubscriberHashMap.get(participantName1), participantSubscriberHashMap.get(participantName2), app, algorithm, event.getFile()));
+
+                        app.startSession();
                         query = app.getSession().createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
                         Algorithm algorithmEntity = (Algorithm)query.list().get(0);
                         Message messageEntity = new Message(participants.get(0), participants.get(1), event.getMessage(), algorithmEntity, cipher, event.getFile().getName().split("/")[1]);
                         app.getSession().save(messageEntity);
-                        String message = app.executeCommands("decrypt message \"" + cipher + "\" using " + algorithm + " and keyfile " + event.getFile().getName().split("/")[1]);
-                        //postbox von part2 getten und dann neuen eintrag machen
+
                         result = participantName2 + " received new message";
                     } else {
                         result = "no valid channel from " + participantName1 + " to "+participantName2;

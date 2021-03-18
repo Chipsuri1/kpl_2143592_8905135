@@ -4,6 +4,7 @@ import base.Configuration;
 import base.LogEngine;
 import entitys.*;
 import entitys.Channel;
+import entitys.Message;
 import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
@@ -74,39 +75,42 @@ public class AppForGUI {
 
         switch (command) {
             case "encrypt":
-                corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
-                result = encrypt(shift, rsa, message, file, command);
+                result = corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
+//                result = encrypt(shift, rsa, message, file, command);
                 break;
             case "decrypt":
-                corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
-                result = decrypt(shift, rsa, message, file, command);
+                result = corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
+//                result = decrypt(shift, rsa, message, file, command);
                 break;
             case "crack":
-                corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
-                return crackEncryptedMessage(shift, rsa, message, file);
+                result = corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
+//                return crackEncryptedMessage(shift, rsa, message, file);
             case "register":
-                corporateNetwork.receive(new Register(input));
-                result = register(input);
+                result = corporateNetwork.receive(new Register(input));
+//                result = register(input);
                 break;
             case "create":
-                corporateNetwork.receive(new Create(input));
-                result = create(input);
+                result = corporateNetwork.receive(new Create(input));
+//                result = create(input);
                 break;
             case "show":
-                corporateNetwork.receive(new Show());
-                result = showChannel();
+                result = corporateNetwork.receive(new Show());
+//                result = showChannel();
                 break;
             case "drop":
-                corporateNetwork.receive(new Drop(input));
-                result = dropChannel(input);
+                result = corporateNetwork.receive(new Drop(input));
+//                result = dropChannel(input);
                 break;
             case "intrude":
-                corporateNetwork.receive(new Intrude(input));
-                result = intrude(input);
+                result = corporateNetwork.receive(new Intrude(input));
+//                result = intrude(input);
                 break;
             case "send":
-                corporateNetwork.receive(new Send(shift, rsa, message, file, input));
-                result = send(shift, rsa, message, file, input);
+                result = corporateNetwork.receive(new Send(shift, rsa, message, file, input));
+//                result = send(shift, rsa, message, file, input);
+                break;
+            case "set":
+                result = setMessageToGUI(input);
                 break;
             default:
                 result = "invalid command, please check your input";
@@ -146,8 +150,6 @@ public class AppForGUI {
                     query.setParameter("participant2", participants.get(1));
                     List queryList = query.list();
                     if (!queryList.isEmpty()) {
-                        entitys.Channel channel = (entitys.Channel) queryList.get(0);
-
                         query = session.createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
                         Algorithm algorithmEntity = (Algorithm)query.list().get(0);
@@ -269,12 +271,27 @@ public class AppForGUI {
                 } else {
                     type = (Type) resultList.get(0);
                 }
+
                 Participant participant = new Participant(participantName, type);
+                ParticipantSubscriber participantSubscriber = null;
+                if(typeString.equals("normal")){
+                    participantSubscriber = new ParticipantSubscriber(participantName, typeString);
+                }else {
+                    participantSubscriber = new IntruderSubscriber(participantName, typeString);
+                }
+                corporateNetwork.getEventBus().register(participantSubscriber);
                 session.save(participant);
                 Postbox postbox = new Postbox(participant);
                 session.save(postbox);
                 result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
             } else {
+                ParticipantSubscriber participantSubscriber = null;
+                if(typeString.equals("normal")){
+                    participantSubscriber = new ParticipantSubscriber(participantName, typeString);
+                }else {
+                    participantSubscriber = new IntruderSubscriber(participantName, typeString);
+                }
+                corporateNetwork.getEventBus().register(participantSubscriber);
                 result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
             }
         }
@@ -455,6 +472,13 @@ public class AppForGUI {
         return stringBuilder.toString();
     }
 
+    private String setMessageToGUI(String input){
+        String message = null;
+        message = input.split(" ")[1];
+
+        return message;
+    }
+
 
     public void startSession() {
         sessionFactory = HibernateUtility.getSessionFactory();
@@ -478,8 +502,8 @@ public class AppForGUI {
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-
         startSession();
+
         Algorithm algorithm = new Algorithm("rsa");
         session.save(algorithm);
         algorithm = new Algorithm("shift");
