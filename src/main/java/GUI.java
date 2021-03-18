@@ -1,5 +1,6 @@
 import base.Configuration;
 import base.FileReader;
+import corporateNetwork.AppForGUI;
 import corporateNetwork.CorporateNetwork;
 import entitys.HSQLDB;
 import javafx.application.Application;
@@ -14,13 +15,10 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 
 public class GUI extends Application{
-    private CorporateNetwork corporateNetwork;
     private FileReader fileReader;
-
     private AppForGUI application;
 
     public GUI(){
-        corporateNetwork = new CorporateNetwork();
         fileReader = new FileReader();
         application = new AppForGUI();
     }

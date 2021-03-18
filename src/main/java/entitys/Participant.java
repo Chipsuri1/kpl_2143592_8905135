@@ -54,10 +54,6 @@ public class Participant {
         this.type = type;
     }
 
-//    public static Participant byName(App app, String name) {
-//        var cq = app.getSession().createQuery("FROM Participant WHERE name = :name");
-//        return (Participant) cq.setParameter("name", name).getSingleResult();
-//    }
 
     @Override
     public boolean equals(Object o) {

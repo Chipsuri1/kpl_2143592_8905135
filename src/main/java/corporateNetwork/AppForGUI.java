@@ -1,6 +1,10 @@
+package corporateNetwork;
+
 import base.Configuration;
 import base.LogEngine;
 import entitys.*;
+import entitys.Channel;
+import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
 import factory.ShiftCrackerFactory;
@@ -19,6 +23,7 @@ public class AppForGUI {
 
     private SessionFactory sessionFactory;
     private Session session;
+    private CorporateNetwork corporateNetwork = new CorporateNetwork(this);
 
     public static void main(String[] args) {
 
@@ -69,29 +74,38 @@ public class AppForGUI {
 
         switch (command) {
             case "encrypt":
+                corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
                 result = encrypt(shift, rsa, message, file, command);
                 break;
             case "decrypt":
+                corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
                 result = decrypt(shift, rsa, message, file, command);
                 break;
             case "crack":
+                corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
                 return crackEncryptedMessage(shift, rsa, message, file);
             case "register":
+                corporateNetwork.receive(new Register(input));
                 result = register(input);
                 break;
             case "create":
+                corporateNetwork.receive(new Create(input));
                 result = create(input);
                 break;
             case "show":
+                corporateNetwork.receive(new Show());
                 result = showChannel();
                 break;
             case "drop":
+                corporateNetwork.receive(new Drop(input));
                 result = dropChannel(input);
                 break;
             case "intrude":
+                corporateNetwork.receive(new Intrude(input));
                 result = intrude(input);
                 break;
             case "send":
+                corporateNetwork.receive(new Send(shift, rsa, message, file, input));
                 result = send(shift, rsa, message, file, input);
                 break;
             default:
@@ -132,7 +146,7 @@ public class AppForGUI {
                     query.setParameter("participant2", participants.get(1));
                     List queryList = query.list();
                     if (!queryList.isEmpty()) {
-                        Channel channel = (Channel) queryList.get(0);
+                        entitys.Channel channel = (entitys.Channel) queryList.get(0);
 
                         query = session.createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
@@ -299,7 +313,7 @@ public class AppForGUI {
                         List query2List = query.list();
 
                         if (query1List.isEmpty() && query2List.isEmpty()) {
-                            Channel channel = new Channel(channelName, participants.get(0), participants.get(1));
+                            entitys.Channel channel = new entitys.Channel(channelName, participants.get(0), participants.get(1));
                             session.save(channel);
                             result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
                         } else {
@@ -347,7 +361,7 @@ public class AppForGUI {
         return result;
     }
 
-    private void tryToAddParticipantToList(ArrayList<Participant> participants, String participantName) {
+    void tryToAddParticipantToList(ArrayList<Participant> participants, String participantName) {
         Query query = session.createQuery("From Participant P WHERE P.name = :participantName");
         query.setParameter("participantName", participantName);
         if (!query.list().isEmpty()) {
@@ -419,7 +433,7 @@ public class AppForGUI {
         if (queryDropChannel.list().size() == 0) {
             result = "unknown channel " + channelNameDropQuery;
         } else {
-            Channel channel = (Channel) queryDropChannel.list().get(0);
+            entitys.Channel channel = (entitys.Channel) queryDropChannel.list().get(0);
             session.delete(channel);
             result = "channel " + channelNameDropQuery + " deleted";
         }
@@ -433,7 +447,7 @@ public class AppForGUI {
 
         StringBuilder stringBuilder = new StringBuilder();
         for (int i = 0; i < showChannelQuery.list().size(); i++) {
-            Channel channel = (Channel) showChannelQuery.list().get(i);
+            entitys.Channel channel = (Channel) showChannelQuery.list().get(i);
             stringBuilder.append(channel.getName() + " | " + channel.getParticipant1().getName() + " and " + channel.getParticipant2().getName());
             stringBuilder.append(Configuration.instance.lineSeparator);
         }
@@ -442,13 +456,13 @@ public class AppForGUI {
     }
 
 
-    private void startSession() {
+    public void startSession() {
         sessionFactory = HibernateUtility.getSessionFactory();
         session = sessionFactory.openSession();
         session.beginTransaction();
     }
 
-    private void endSession() {
+    public void endSession() {
         session.getTransaction().commit();
     }
 
@@ -471,5 +485,9 @@ public class AppForGUI {
         algorithm = new Algorithm("shift");
         session.save(algorithm);
         endSession();
+    }
+
+    public Session getSession() {
+        return session;
     }
 }
