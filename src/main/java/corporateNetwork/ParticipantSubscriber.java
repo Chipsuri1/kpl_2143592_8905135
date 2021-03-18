@@ -9,6 +9,7 @@ import org.hibernate.query.Query;
 
 import java.io.File;
 
+
 public class ParticipantSubscriber extends Subscriber {
     protected String name;
     protected String type;
@@ -22,8 +23,11 @@ public class ParticipantSubscriber extends Subscriber {
     public void receive(MessageEvent event) {
         System.out.println(name + " received a message!");
         if (event.getParticipantSubscriberTo().equals(this)) {
-
-            String message = event.getApp().decrypt(event.getAlgorithm(), event.getCipher(), event.getFile());
+            File file = new File("configuration/privateKeyfile.json");
+            if(event.getAlgorithm().equals("shift")){
+                file = event.getFile();
+            }
+            String message = event.getApp().decrypt(event.getAlgorithm(), event.getCipher(), file);
 
             event.getApp().startSession();
             Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");

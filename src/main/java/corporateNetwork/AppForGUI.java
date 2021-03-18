@@ -29,12 +29,12 @@ public class AppForGUI {
     public static void main(String[] args) {
 
         AppForGUI app = new AppForGUI();
-        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
         app.setupAlgo();
 
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
-
+        Configuration.instance.debugMode = true;
+        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("register participant branch_hkg with type normal");
         app.executeCommands("register participant branch_cpt with type normal");
         app.executeCommands("register participant branch_sfo with type normal");
@@ -61,12 +61,14 @@ public class AppForGUI {
         app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
 
+        app.executeCommands("intrude channel hkg_wuh by msa");
 
         app.executeCommands("send message \"187\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
-//        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
-//        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
-//        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
-//        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyFile.json");
+
+        app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
+        app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
+        app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
+        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyfile.json");
     }
 
 
@@ -285,12 +287,15 @@ public class AppForGUI {
 
                 Participant participant = new Participant(participantName, type);
                 ParticipantSubscriber participantSubscriber = null;
+                IntruderSubscriber intruderSubscriber = null;
                 if(typeString.equals("normal")){
                     participantSubscriber = new ParticipantSubscriber(participantName, typeString);
+                    corporateNetwork.getEventBus().register(participantSubscriber);
                 }else {
-                    participantSubscriber = new IntruderSubscriber(participantName, typeString);
+                    intruderSubscriber = new IntruderSubscriber(participantName, typeString);
+                    corporateNetwork.getEventBus().register(intruderSubscriber);
                 }
-                corporateNetwork.getEventBus().register(participantSubscriber);
+
                 session.save(participant);
                 Postbox postbox = new Postbox(participant);
                 session.save(postbox);

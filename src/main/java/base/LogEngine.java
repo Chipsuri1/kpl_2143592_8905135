@@ -12,7 +12,7 @@ public enum LogEngine {
 
     public void init(String logFile) {
         try {
-            bufferedWriter = new BufferedWriter(new FileWriter(new File("../../../log/"+logFile+".txt")));
+            bufferedWriter = new BufferedWriter(new FileWriter(new File("log/"+logFile+".txt")));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }

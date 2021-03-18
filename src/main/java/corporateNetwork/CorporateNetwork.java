@@ -117,7 +117,6 @@ public class CorporateNetwork {
             LogEngine.instance.writeLn("Command: " + event.getCommand() + ", Message: " + event.getMessage() + ", Cipher: " + result + ", algorithm: " + algorithm);
             LogEngine.instance.close();
         }
-        app.endSession();
         return result;
     }
 
