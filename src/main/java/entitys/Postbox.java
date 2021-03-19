@@ -15,7 +15,6 @@ public class Postbox {
 
     public Postbox(Participant participantTo) {
         this.participantTo = participantTo;
-        //TODO timestamp
         timestamp = Math.toIntExact((System.currentTimeMillis() / 1000L));
     }
 
