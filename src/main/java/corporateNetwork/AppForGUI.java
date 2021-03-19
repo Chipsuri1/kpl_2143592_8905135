@@ -56,8 +56,8 @@ public class AppForGUI {
 
         app.executeCommands("intrude channel hkg_wuh by msa");
 
-//        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
-        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
+        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
+//        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
 
         app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
@@ -261,8 +261,8 @@ public class AppForGUI {
         executeCommands("register participant branch_sfo with type normal");
         executeCommands("register participant branch_syd with type normal");
         executeCommands("register participant branch_wuh with type normal");
-        executeCommands("register participant branch_sfo with type normal");
         executeCommands("register participant msa with type intruder");
+
         executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
