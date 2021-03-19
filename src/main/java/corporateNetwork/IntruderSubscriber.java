@@ -6,6 +6,8 @@ import entitys.Postbox;
 import event.MessageEvent;
 import org.hibernate.query.Query;
 
+import java.io.File;
+
 public class IntruderSubscriber extends ParticipantSubscriber {
     public IntruderSubscriber(String name, String type) {
         super(name, type);
@@ -21,7 +23,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         queryGetPostbox.setParameter("participantTo", participant);
         Postbox postbox = (Postbox) queryGetPostbox.list().get(0);
         postbox.setMessage("unknown");
-//        event.setFile(new File("configuration/publicKeyfile.json"));
+        event.setFile(new File("configuration/publicKeyfile.json"));
         String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
 
         if (message == null || message.equals("Invalid algorithm. Please try again") || message.contains("failed")) {

@@ -342,12 +342,12 @@ public class CorporateNetwork {
                         app.getSession().save(messageEntity);
 
                         result = participantName2 + " received new message";
+//                        app.endSession();
                     } else {
                         result = "no valid channel from " + participantName1 + " to " + participantName2;
                     }
                 }
             }
-            app.endSession();
         }
         return result;
     }

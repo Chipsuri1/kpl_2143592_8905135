@@ -50,4 +50,8 @@ public class MessageEvent {
     public String getAlgorithm() {
         return algorithm;
     }
+
+    public void setFile(File file) {
+        this.file = file;
+    }
 }

@@ -56,7 +56,8 @@ public class AppForGUI {
 
         app.executeCommands("intrude channel hkg_wuh by msa");
 
-        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
+//        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
+        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
 
         app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
