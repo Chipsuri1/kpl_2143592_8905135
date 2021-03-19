@@ -11,7 +11,6 @@ public class ShiftCracker {
         port = new Port();
     }
 
-    // rtwumjzx
     public String innerDecrypt(String encryptedMessage) {
         long unixTimeStart = System.currentTimeMillis() / 1000L;
         encryptedMessage = encryptedMessage.toUpperCase();
