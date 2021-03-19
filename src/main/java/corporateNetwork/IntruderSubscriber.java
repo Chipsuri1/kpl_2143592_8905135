@@ -4,7 +4,6 @@ import com.google.common.eventbus.Subscribe;
 import entitys.Participant;
 import entitys.Postbox;
 import event.MessageEvent;
-import org.hibernate.query.Query;
 
 import java.io.File;
 
@@ -17,12 +16,14 @@ public class IntruderSubscriber extends ParticipantSubscriber {
     public void receive(MessageEvent event) {
         org.hibernate.query.Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
         queryGetParticipant.setParameter("name", name);
-        Participant participant = (Participant) queryGetParticipant.list().get(0);
+        Participant participantIntruder = (Participant) queryGetParticipant.list().get(0);
 
-        //TODO eig neuen Eintrag in der Postbox
-        Query queryGetPostbox = event.getApp().getSession().createQuery("from Postbox P WHERE P.participantTo = :participantTo");
-        queryGetPostbox.setParameter("participantTo", participant);
-        Postbox postbox = (Postbox) queryGetPostbox.list().get(0);
+        queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
+        queryGetParticipant.setParameter("name", event.getParticipantSubscriberFrom().name);
+        Participant participantFrom = (Participant) queryGetParticipant.list().get(0);
+
+        Postbox postbox = new Postbox(participantIntruder);
+        postbox.setParticipantFrom(participantFrom);
         postbox.setMessage("unknown");
         event.setFile(new File("configuration/publicKeyfile.json"));
         String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
@@ -34,5 +35,6 @@ public class IntruderSubscriber extends ParticipantSubscriber {
             postbox.setMessage(message);
             event.getApp().executeCommands("set intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
         }
+        event.getApp().getSession().save(postbox);
     }
 }

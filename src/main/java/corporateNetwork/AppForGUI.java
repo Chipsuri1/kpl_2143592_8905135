@@ -62,40 +62,44 @@ public class AppForGUI {
         app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
         app.executeCommands("encrypt message \"yuhu\" using shift and keyfile keyfile.json");
-        app.executeCommands("decrypt message \"yuhu\" using shift and keyfile keyfile.json");
+        app.executeCommands("decrypt message \"~zmz\" using shift and keyfile keyfile.json");
     }
 
 
     public String executeCommands(String input) {
-        String command = input.split(" ")[0];
-        String result;
-        boolean rsa = false;
-        boolean shift = false;
-        File file = null;
-        String dataPath;
-        String message = null;
-        if (input.contains("\"")) {
-            message = input.split("\"")[1];
-            shift = input.substring(input.lastIndexOf("\"")).contains("shift");
-            rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
+        String result = "Error";
+        try{
+            String command = input.split(" ")[0];
+            boolean rsa = false;
+            boolean shift = false;
+            File file = null;
+            String dataPath;
+            String message = null;
+            if (input.contains("\"")) {
+                message = input.split("\"")[1];
+                shift = input.substring(input.lastIndexOf("\"")).contains("shift");
+                rsa = input.substring(input.lastIndexOf("\"")).contains("rsa");
+            }
+            if (input.contains("keyfile")) {
+                dataPath = "configuration/" + input.split("keyfile", 2)[1].substring(1);
+                file = new File(dataPath);
+            }
+            result = switch (command) {
+                case "encrypt" -> corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
+                case "decrypt" -> corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
+                case "crack" -> corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
+                case "register" -> corporateNetwork.receive(new Register(input));
+                case "create" -> corporateNetwork.receive(new Create(input));
+                case "show" -> corporateNetwork.receive(new Show());
+                case "drop" -> corporateNetwork.receive(new Drop(input));
+                case "intrude" -> corporateNetwork.receive(new Intrude(input));
+                case "send" -> corporateNetwork.receive(new Send(shift, rsa, message, file, input));
+                case "set" -> setMessageToGUI(input);
+                default -> "invalid command, please check your input";
+            };
+        }catch (Exception e){
+            e.printStackTrace();
         }
-        if (input.contains("keyfile")) {
-            dataPath = "configuration/" + input.split("keyfile", 2)[1].substring(1);
-            file = new File(dataPath);
-        }
-        result = switch (command) {
-            case "encrypt" -> corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
-            case "decrypt" -> corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
-            case "crack" -> corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
-            case "register" -> corporateNetwork.receive(new Register(input));
-            case "create" -> corporateNetwork.receive(new Create(input));
-            case "show" -> corporateNetwork.receive(new Show());
-            case "drop" -> corporateNetwork.receive(new Drop(input));
-            case "intrude" -> corporateNetwork.receive(new Intrude(input));
-            case "send" -> corporateNetwork.receive(new Send(shift, rsa, message, file, input));
-            case "set" -> setMessageToGUI(input);
-            default -> "invalid command, please check your input";
-        };
         return result;
     }
 

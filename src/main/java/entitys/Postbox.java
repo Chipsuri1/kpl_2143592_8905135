@@ -15,10 +15,11 @@ public class Postbox {
 
     public Postbox(Participant participantTo) {
         this.participantTo = participantTo;
+        //TODO timestamp
+        timestamp = Math.toIntExact((System.currentTimeMillis() / 1000L));
     }
 
     public Postbox(){
-
     }
 
     @ManyToOne
@@ -26,7 +27,7 @@ public class Postbox {
     private Participant participantTo;
 
     @ManyToOne
-    @JoinColumn(name = "participant_from_id", unique = true)
+    @JoinColumn(name = "participant_from_id")
     private Participant participantFrom;
 
     @Column(name = "message")
