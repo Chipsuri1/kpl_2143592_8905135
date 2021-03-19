@@ -72,10 +72,12 @@ public class CorporateNetwork {
         }
 
         if (Configuration.instance.debugMode) {
+            LogEngine.instance.init("encrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
             LogEngine.instance.writeLn("Command: " + event.getCommand());
             LogEngine.instance.writeLn("Algorithm: " + algorithm);
-            LogEngine.instance.writeLn("Cipher: " + result);
             LogEngine.instance.writeLn("Message: " + event.getMessage());
+            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.close();
         }
         return result;
     }
@@ -113,11 +115,11 @@ public class CorporateNetwork {
             }
         }
         if (Configuration.instance.debugMode) {
-            LogEngine.instance.init(event.getCommand() + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
+            LogEngine.instance.init("decrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
             LogEngine.instance.writeLn("Command: " + event.getCommand());
             LogEngine.instance.writeLn("Algorithm: " + algorithm);
-            LogEngine.instance.writeLn("Cipher: " + result);
-            LogEngine.instance.writeLn("Message: " + event.getMessage());
+            LogEngine.instance.writeLn("Cipher: " + event.getMessage());
+            LogEngine.instance.writeLn("Message: " + result);
             LogEngine.instance.close();
         }
         return result;

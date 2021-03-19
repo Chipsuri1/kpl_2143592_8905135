@@ -98,69 +98,71 @@ public class AppForGUI {
         return result;
     }
 
-    public String decrypt(String algorithm, String message, File file) {
+    public String decrypt(String algorithm, String cipher, File file) {
         Object decrypter;
-        String result = null;
+        String message = null;
         if (algorithm.equals("shift")) {
             algorithm = "shift";
             decrypter = ShiftFactory.build();
             try {
                 Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
-                result = (String) decryptMethod.invoke(decrypter, message, file);
+                message = (String) decryptMethod.invoke(decrypter, cipher, file);
 
-                System.out.println(result);
+                System.out.println(message);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else if (algorithm.equals("rsa")) {
             algorithm = "rsa";
+            file = new File("configuration/privateKeyfile.json");
             decrypter = RSAFactory.build();
-            String[] inputs = message.split(" ");
+            String[] inputs = cipher.split(" ");
             try {
                 Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String input : inputs) {
                     stringBuilder.append((String) decryptMethod.invoke(decrypter, input, file));
                 }
-                result = stringBuilder.toString();
+                message = stringBuilder.toString();
 
-                System.out.println(result);
+                System.out.println(message);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         }
         if (Configuration.instance.debugMode) {
             LogEngine.instance.init("decrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: encrypt");
+            LogEngine.instance.writeLn("Command: decrypt");
             LogEngine.instance.writeLn("Algorithm: " + algorithm);
-            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.writeLn("Cipher: " + cipher);
             LogEngine.instance.writeLn("Message: " + message);
             LogEngine.instance.close();
         }
-        return result;
+        return message;
     }
 
     public String encrypt(String algorithm, String message, File file) {
         Object encryptor;
-        String result = null;
+        String cipher = null;
         if (algorithm.equals("shift")) {
             encryptor = ShiftFactory.build();
             try {
                 Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
-                result = (String) encryptMethod.invoke(encryptor, message, file);
+                cipher = (String) encryptMethod.invoke(encryptor, message, file);
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
             }
         } else if (algorithm.equals("rsa")) {
             encryptor = RSAFactory.build();
             try {
+                file = new File("configuration/publicKeyfile.json");
                 String[] inputStrings = message.split("");
                 Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
                 for (String inputString : inputStrings) {
                     stringBuilder.append(encryptMethod.invoke(encryptor, inputString, file)).append(" ");
                 }
-                result = stringBuilder.toString();
+                cipher = stringBuilder.toString();
 
             } catch (NoSuchMethodException | IllegalAccessException | InvocationTargetException e) {
                 e.printStackTrace();
@@ -170,12 +172,12 @@ public class AppForGUI {
             LogEngine.instance.init("encrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
             LogEngine.instance.writeLn("Command: encrypt");
             LogEngine.instance.writeLn("Algorithm: " + algorithm);
-            LogEngine.instance.writeLn("Cipher: " + result);
             LogEngine.instance.writeLn("Message: " + message);
+            LogEngine.instance.writeLn("Cipher: " + cipher);
             LogEngine.instance.close();
         }
         endSession();
-        return result;
+        return cipher;
     }
 
 
@@ -202,7 +204,6 @@ public class AppForGUI {
         try {
             Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class, File.class);
             String[] inputs = message.split(" ");
-
             StringBuilder stringBuilder = new StringBuilder();
             for (String input : inputs) {
                 stringBuilder.append((String) decryptMethod.invoke(cracker, input, file));
