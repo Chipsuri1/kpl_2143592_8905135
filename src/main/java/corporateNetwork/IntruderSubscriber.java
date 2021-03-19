@@ -1,5 +1,6 @@
 package corporateNetwork;
 
+import base.Configuration;
 import com.google.common.eventbus.Subscribe;
 import entitys.Participant;
 import entitys.Postbox;
@@ -12,7 +13,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
     }
 
     @Subscribe
-    public void receive(MessageEvent event){
+    public void receive(MessageEvent event) {
         org.hibernate.query.Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
         queryGetParticipant.setParameter("name", name);
         Participant participant = (Participant) queryGetParticipant.list().get(0);
@@ -23,11 +24,12 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         postbox.setMessage("unknown");
         String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
 
-        if(message == null || message.equals("Invalid algorithm. Please try again") || message.contains("failed")){
-            event.getApp().executeCommands("set " + "intruder " + name +" | crack message from participant " + event.getParticipantSubscriberFrom().name + " failed");
-        }else {
+        if (message == null || message.equals("Invalid algorithm. Please try again") || message.contains("failed")) {
+            event.getApp().executeCommands("set " + "intruder " + name + " | crack message from participant " + event.getParticipantSubscriberFrom().name + " failed");
+        } else {
+            System.out.println("intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
             postbox.setMessage(message);
-            event.getApp().executeCommands("set " + "intruder " + name + " cracked message from participant "+event.getParticipantSubscriberFrom().name + " | " + message);
+            event.getApp().executeCommands("set " + "intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
         }
     }
 }

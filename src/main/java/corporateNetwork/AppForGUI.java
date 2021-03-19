@@ -56,10 +56,10 @@ public class AppForGUI {
         app.executeCommands("register participant branch_sfo with type normal");
         app.executeCommands("register participant msa with type intruder");
 
-        app.executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
-        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
-        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
-        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
+//        app.executeCommands("create channel hkg_wuh from branch_hkg to branch_wuh");
+//        app.executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
+//        app.executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
+//        app.executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
 
         app.executeCommands("intrude channel hkg_wuh by msa");
 
@@ -519,7 +519,6 @@ public class AppForGUI {
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-        setupAlgo();
     }
 
     public void setupAlgo(){

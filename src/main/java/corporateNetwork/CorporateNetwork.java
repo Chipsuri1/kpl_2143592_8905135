@@ -242,7 +242,7 @@ public class CorporateNetwork {
             IntruderSubscriber intruderSubscriber = (IntruderSubscriber) participantSubscriberHashMap.get(participantName);
             channel.getEventBus().register(intruderSubscriber);
         }
-
+        result = app.executeCommands("set " + participantName+" subscribed channel " + channelName);
         app.endSession();
         return result;
     }
