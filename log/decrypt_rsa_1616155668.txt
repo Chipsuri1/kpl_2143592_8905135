@@ -1,0 +1,4 @@
+Command: decrypt
+Algorithm: rsa
+Cipher: dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== 
+Message: vaccine for covid is stored in building abc
