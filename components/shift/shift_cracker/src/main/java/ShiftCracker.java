@@ -49,7 +49,7 @@ public class ShiftCracker {
             String output = smartShift(shift, unicode, unicodeCopy);
 
             if(output != null){
-                stringBuilder.append("Reshift: " + shift + " " + output);
+                stringBuilder.append("Reshift: ").append(shift).append(" ").append(output);
                 stringBuilder.append(System.getProperty("line.separator"));
             }
         }

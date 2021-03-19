@@ -3,8 +3,6 @@ package corporateNetwork;
 import base.Configuration;
 import base.LogEngine;
 import entitys.*;
-import entitys.Channel;
-import entitys.Message;
 import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
@@ -55,7 +53,7 @@ public class AppForGUI {
 
         app.executeCommands("intrude channel hkg_wuh by msa");
 
-        app.executeCommands("send message \"187\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
+        app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
 
         app.executeCommands("encrypt message \"y\" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("decrypt message \"ANQ=\" using rsa and keyfile privateKeyfile.json");
@@ -66,7 +64,7 @@ public class AppForGUI {
 
     public String executeCommands(String input) {
         String command = input.split(" ")[0];
-        String result = null;
+        String result;
         boolean rsa = false;
         boolean shift = false;
         File file = null;
@@ -81,45 +79,24 @@ public class AppForGUI {
             dataPath = "configuration/" + input.split("keyfile", 2)[1].substring(1);
             file = new File(dataPath);
         }
-        switch (command) {
-            case "encrypt":
-                result = corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
-                break;
-            case "decrypt":
-                result = corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
-                break;
-            case "crack":
-                result = corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
-                break;
-            case "register":
-                result = corporateNetwork.receive(new Register(input));
-                break;
-            case "create":
-                result = corporateNetwork.receive(new Create(input));
-                break;
-            case "show":
-                result = corporateNetwork.receive(new Show());
-                break;
-            case "drop":
-                result = corporateNetwork.receive(new Drop(input));
-                break;
-            case "intrude":
-                result = corporateNetwork.receive(new Intrude(input));
-                break;
-            case "send":
-                result = corporateNetwork.receive(new Send(shift, rsa, message, file, input));
-                break;
-            case "set":
-                result = setMessageToGUI(input);
-                break;
-            default:
-                result = "invalid command, please check your input";
-        }
+        result = switch (command) {
+            case "encrypt" -> corporateNetwork.receive(new Encrypt(shift, rsa, message, file, command));
+            case "decrypt" -> corporateNetwork.receive(new Decrypt(shift, rsa, message, file, command));
+            case "crack" -> corporateNetwork.receive(new CrackEncryptedMessage(shift, rsa, message, file));
+            case "register" -> corporateNetwork.receive(new Register(input));
+            case "create" -> corporateNetwork.receive(new Create(input));
+            case "show" -> corporateNetwork.receive(new Show());
+            case "drop" -> corporateNetwork.receive(new Drop(input));
+            case "intrude" -> corporateNetwork.receive(new Intrude(input));
+            case "send" -> corporateNetwork.receive(new Send(shift, rsa, message, file, input));
+            case "set" -> setMessageToGUI(input);
+            default -> "invalid command, please check your input";
+        };
         return result;
     }
 
     public String decrypt(String algorithm, String message, File file) {
-        Object decrypter = null;
+        Object decrypter;
         String result = null;
         if (algorithm.equals("shift")) {
             algorithm = "shift";
@@ -139,8 +116,8 @@ public class AppForGUI {
             try {
                 Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < inputs.length; i++) {
-                    stringBuilder.append((String) decryptMethod.invoke(decrypter, inputs[i], file));
+                for (String input : inputs) {
+                    stringBuilder.append((String) decryptMethod.invoke(decrypter, input, file));
                 }
                 result = stringBuilder.toString();
 
@@ -151,14 +128,17 @@ public class AppForGUI {
         }
         if (Configuration.instance.debugMode) {
             LogEngine.instance.init("decrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: decrypt, Message: " + message + ", Cipher: " + result + ", algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Command: encrypt");
+            LogEngine.instance.writeLn("Algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.writeLn("Message: " + message);
             LogEngine.instance.close();
         }
         return result;
     }
 
     public String encrypt(String algorithm, String message, File file) {
-        Object encryptor = null;
+        Object encryptor;
         String result = null;
         if (algorithm.equals("shift")) {
             encryptor = ShiftFactory.build();
@@ -174,8 +154,8 @@ public class AppForGUI {
                 String[] inputStrings = message.split("");
                 Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < inputStrings.length; i++) {
-                    stringBuilder.append(encryptMethod.invoke(encryptor, inputStrings[i], file) + " ");
+                for (String inputString : inputStrings) {
+                    stringBuilder.append(encryptMethod.invoke(encryptor, inputString, file)).append(" ");
                 }
                 result = stringBuilder.toString();
 
@@ -185,7 +165,10 @@ public class AppForGUI {
         }
         if (Configuration.instance.debugMode) {
             LogEngine.instance.init("encrypt_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: encrypt, algorithm: " + algorithm + ",Message: " + message + ", Cipher: " + result);
+            LogEngine.instance.writeLn("Command: encrypt");
+            LogEngine.instance.writeLn("Algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.writeLn("Message: " + message);
             LogEngine.instance.close();
         }
         endSession();
@@ -218,8 +201,8 @@ public class AppForGUI {
             String[] inputs = message.split(" ");
 
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < inputs.length; i++) {
-                stringBuilder.append((String) decryptMethod.invoke(cracker, inputs[i], file));
+            for (String input : inputs) {
+                stringBuilder.append((String) decryptMethod.invoke(cracker, input, file));
             }
             String encryptedMessage = stringBuilder.toString();
 
@@ -253,9 +236,7 @@ public class AppForGUI {
     }
 
     private String setMessageToGUI(String input){
-        String message = null;
-        message = input.replaceFirst("set ", "");
-        return message;
+        return input.replaceFirst("set ", "");
     }
 
 

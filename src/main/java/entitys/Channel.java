@@ -1,6 +1,5 @@
 package entitys;
 
-import com.google.common.eventbus.EventBus;
 import com.sun.istack.NotNull;
 
 import javax.persistence.*;

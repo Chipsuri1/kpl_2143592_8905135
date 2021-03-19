@@ -30,10 +30,10 @@ public class FileReader {
 
     public String readLogFile() {
         StringBuilder stringBuilder = new StringBuilder();
-        BufferedReader br = null;
+        BufferedReader br;
         try {
             br = new BufferedReader(new java.io.FileReader(getLastModified(Configuration.instance.logDirectory)));
-            String line = null;
+            String line;
             while ((line = br.readLine()) != null) {
                 stringBuilder.append(line);
                 stringBuilder.append(Configuration.instance.lineSeparator);

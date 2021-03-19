@@ -3,9 +3,8 @@ package corporateNetwork;
 import base.Configuration;
 import base.LogEngine;
 import com.google.common.eventbus.EventBus;
-import entitys.*;
 import entitys.Channel;
-import entitys.Message;
+import entitys.*;
 import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
@@ -43,7 +42,7 @@ public class CorporateNetwork {
     }
 
     public String receive(Encrypt event) {
-        Object encryptor = null;
+        Object encryptor;
         String algorithm = null;
         String result = null;
         if (event.isShift()) {
@@ -62,8 +61,8 @@ public class CorporateNetwork {
                 String[] inputStrings = event.getMessage().split("");
                 Method encryptMethod = encryptor.getClass().getDeclaredMethod("encrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < inputStrings.length; i++) {
-                    stringBuilder.append(encryptMethod.invoke(encryptor, inputStrings[i], event.getFile()) + " ");
+                for (String inputString : inputStrings) {
+                    stringBuilder.append(encryptMethod.invoke(encryptor, inputString, event.getFile())).append(" ");
                 }
                 result = stringBuilder.toString();
 
@@ -73,15 +72,16 @@ public class CorporateNetwork {
         }
 
         if (Configuration.instance.debugMode) {
-            LogEngine.instance.init(event.getCommand() + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: " + event.getCommand() + ", algorithm: " + algorithm + ",Message: " + event.getMessage() + ", Cipher: " + result);
-            LogEngine.instance.close();
+            LogEngine.instance.writeLn("Command: " + event.getCommand());
+            LogEngine.instance.writeLn("Algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.writeLn("Message: " + event.getMessage());
         }
         return result;
     }
 
     public String receive(Decrypt event) {
-        Object decrypter = null;
+        Object decrypter;
         String algorithm = null;
         String result = null;
         if (event.isShift()) {
@@ -102,8 +102,8 @@ public class CorporateNetwork {
             try {
                 Method decryptMethod = decrypter.getClass().getDeclaredMethod("decrypt", String.class, File.class);
                 StringBuilder stringBuilder = new StringBuilder();
-                for (int i = 0; i < inputs.length; i++) {
-                    stringBuilder.append((String) decryptMethod.invoke(decrypter, inputs[i], event.getFile()));
+                for (String input : inputs) {
+                    stringBuilder.append((String) decryptMethod.invoke(decrypter, input, event.getFile()));
                 }
                 result = stringBuilder.toString();
 
@@ -114,7 +114,10 @@ public class CorporateNetwork {
         }
         if (Configuration.instance.debugMode) {
             LogEngine.instance.init(event.getCommand() + "_" + algorithm + "_" + (System.currentTimeMillis() / 1000L));
-            LogEngine.instance.writeLn("Command: " + event.getCommand() + ", Message: " + event.getMessage() + ", Cipher: " + result + ", algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Command: " + event.getCommand());
+            LogEngine.instance.writeLn("Algorithm: " + algorithm);
+            LogEngine.instance.writeLn("Cipher: " + result);
+            LogEngine.instance.writeLn("Message: " + event.getMessage());
             LogEngine.instance.close();
         }
         return result;
@@ -136,8 +139,8 @@ public class CorporateNetwork {
             String[] inputs = message.split(" ");
 
             StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < inputs.length; i++) {
-                stringBuilder.append((String) decryptMethod.invoke(cracker, inputs[i], file));
+            for (String input : inputs) {
+                stringBuilder.append((String) decryptMethod.invoke(cracker, input, file));
             }
             String encryptedMessage = stringBuilder.toString();
 
@@ -175,7 +178,7 @@ public class CorporateNetwork {
         String input = event.getInput();
 
         app.startSession();
-        Query query = null;
+        Query query;
         String result = null;
         ArrayList<Participant> participants = new ArrayList<>();
         String[] inputStrings = input.split(" ");
@@ -223,7 +226,7 @@ public class CorporateNetwork {
         }
         app.endSession();
         return result;
-}
+    }
 
     public String receive(Intrude event) {
         app.startSession();
@@ -240,7 +243,7 @@ public class CorporateNetwork {
             IntruderSubscriber intruderSubscriber = (IntruderSubscriber) participantSubscriberHashMap.get(participantName);
             channel.getEventBus().register(intruderSubscriber);
         }
-        result = app.executeCommands("set " + participantName+" subscribed channel " + channelName);
+        result = app.executeCommands("set " + participantName + " subscribed channel " + channelName);
         app.endSession();
         return result;
     }
@@ -269,10 +272,10 @@ public class CorporateNetwork {
                 }
 
                 Participant participant = new Participant(participantName, type);
-                ParticipantSubscriber participantSubscriber = null;
-                if(typeString.equals("normal")){
+                ParticipantSubscriber participantSubscriber;
+                if (typeString.equals("normal")) {
                     participantSubscriber = new ParticipantSubscriber(participantName, typeString);
-                }else {
+                } else {
                     participantSubscriber = new IntruderSubscriber(participantName, typeString);
                 }
 
@@ -298,13 +301,13 @@ public class CorporateNetwork {
         String algorithm = null;
         if (event.isShift()) {
             algorithm = "shift";
-        } else if(event.isRsa()){
+        } else if (event.isRsa()) {
             algorithm = "rsa";
         }
 
         Query query;
         ArrayList<Participant> participants = new ArrayList<>();
-        String[] inputStrings =  event.getInput().split("\" ")[1].split(" ");
+        String[] inputStrings = event.getInput().split("\" ")[1].split(" ");
         String participantName1;
         String participantName2;
         if (inputStrings.length == 9) {
@@ -348,22 +351,22 @@ public class CorporateNetwork {
     }
 
     public String receive(Show event) {
-            app.startSession();
-            Query showChannelQuery = app.getSession().createQuery("FROM Channel");
+        app.startSession();
+        Query showChannelQuery = app.getSession().createQuery("FROM Channel");
 
-            StringBuilder stringBuilder = new StringBuilder();
-            for (int i = 0; i < showChannelQuery.list().size(); i++) {
-                entitys.Channel channel = (Channel) showChannelQuery.list().get(i);
-                stringBuilder.append(channel.getName() + " | " + channel.getParticipant1().getName() + " and " + channel.getParticipant2().getName());
-                stringBuilder.append(Configuration.instance.lineSeparator);
-            }
-            app.endSession();
-            return stringBuilder.toString();
+        StringBuilder stringBuilder = new StringBuilder();
+        for (int i = 0; i < showChannelQuery.list().size(); i++) {
+            entitys.Channel channel = (Channel) showChannelQuery.list().get(i);
+            stringBuilder.append(channel.getName()).append(" | ").append(channel.getParticipant1().getName()).append(" and ").append(channel.getParticipant2().getName());
+            stringBuilder.append(Configuration.instance.lineSeparator);
+        }
+        app.endSession();
+        return stringBuilder.toString();
 
     }
 
     public String receive(Drop event) {
-        String result = null;
+        String result;
         app.startSession();
         String[] inputStrings = event.getInput().split("channel ");
         String channelNameDropQuery = inputStrings[1];

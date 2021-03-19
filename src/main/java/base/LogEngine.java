@@ -1,7 +1,6 @@
 package base;
 
 import java.io.BufferedWriter;
-import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
 
@@ -12,7 +11,7 @@ public enum LogEngine {
 
     public void init(String logFile) {
         try {
-            bufferedWriter = new BufferedWriter(new FileWriter(new File("log/"+logFile+".txt")));
+            bufferedWriter = new BufferedWriter(new FileWriter("log/"+logFile+".txt"));
         } catch (IOException e) {
             System.out.println(e.getMessage());
         }
@@ -21,14 +20,6 @@ public enum LogEngine {
     public void writeLn(String line) {
         try {
             bufferedWriter.write(line + Configuration.instance.lineSeparator);
-        } catch (IOException ioe) {
-            System.out.println(ioe.getMessage());
-        }
-    }
-
-    public void write(String line) {
-        try {
-            bufferedWriter.write(line);
         } catch (IOException ioe) {
             System.out.println(ioe.getMessage());
         }

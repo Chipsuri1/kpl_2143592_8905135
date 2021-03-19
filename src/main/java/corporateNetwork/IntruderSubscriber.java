@@ -1,6 +1,5 @@
 package corporateNetwork;
 
-import base.Configuration;
 import com.google.common.eventbus.Subscribe;
 import entitys.Participant;
 import entitys.Postbox;
