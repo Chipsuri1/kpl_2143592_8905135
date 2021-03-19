@@ -227,9 +227,7 @@ public class CorporateNetwork {
 
     public String receive(Intrude event) {
         app.startSession();
-        String result = null;
-        boolean successful = false;
-        Participant participant = null;
+        String result;
         Query query;
         String[] inputStrings = event.getInput().split(" ");
         String channelName = inputStrings[2];
@@ -262,7 +260,7 @@ public class CorporateNetwork {
                 query = app.getSession().createQuery("from Type T WHERE T.name = :typeString");
                 query.setParameter("typeString", typeString);
                 resultList = query.list();
-                Type type = null;
+                Type type;
                 if (resultList.isEmpty()) {
                     type = new Type(typeString);
                     app.getSession().save(type);
@@ -296,7 +294,7 @@ public class CorporateNetwork {
     public String receive(Send event) {
         app.startSession();
         String result = null;
-        String cipher = null;
+        String cipher;
         String algorithm = null;
         if (event.isShift()) {
             algorithm = "shift";
@@ -304,11 +302,11 @@ public class CorporateNetwork {
             algorithm = "rsa";
         }
 
-        Query query = null;
+        Query query;
         ArrayList<Participant> participants = new ArrayList<>();
         String[] inputStrings =  event.getInput().split("\" ")[1].split(" ");
-        String participantName1 = null;
-        String participantName2 = null;
+        String participantName1;
+        String participantName2;
         if (inputStrings.length == 9) {
             participantName1 = inputStrings[1];
             participantName2 = inputStrings[3];
