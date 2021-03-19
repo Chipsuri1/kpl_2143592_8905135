@@ -347,8 +347,11 @@ public class CorporateNetwork {
                         result = "no valid channel from " + participantName1 + " to " + participantName2;
                     }
                 }
+            }else {
+                result = "no valid channel from " + participantName1 + " to " + participantName2;
             }
         }
+        app.endSession();
         return result;
     }
 
