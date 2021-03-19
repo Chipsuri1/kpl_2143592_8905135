@@ -34,7 +34,8 @@ public class AppForGUI {
 //        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
 //        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
         Configuration.instance.debugMode = true;
-        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
+//        app.executeCommands("crack encrypted message \"Ytgnfx%nxy%qtxy\" using shift");
+//        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("register participant branch_hkg with type normal");
         app.executeCommands("register participant branch_cpt with type normal");
         app.executeCommands("register participant branch_sfo with type normal");
@@ -442,6 +443,8 @@ public class AppForGUI {
             Method decryptMethod = cracker.getClass().getDeclaredMethod("decrypt", String.class);
             String encryptedMessage = (String) decryptMethod.invoke(cracker, message);
 
+            System.out.println("lel");
+            System.out.println(encryptedMessage);
             if (encryptedMessage.equals("time is over 30 seconds")) {
                 System.err.println("Calculation took to long");
                 return "cracking encrypted method \"" + message + "\" failed";
@@ -519,7 +522,7 @@ public class AppForGUI {
         executeCommands("create channel hkg_cpt from branch_hkg to branch_cpt");
         executeCommands("create channel cpt_syd from branch_cpt to branch_syd");
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
-        setupAlgo();
+//        setupAlgo();
     }
 
     public void setupAlgo(){

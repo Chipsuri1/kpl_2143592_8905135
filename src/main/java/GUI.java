@@ -26,6 +26,8 @@ public class GUI extends Application{
     public void start(Stage primaryStage) {
         HSQLDB.instance.setupDatabase();
         application.setupData();
+        application.setupData();
+        application.setupAlgo();
         primaryStage.setTitle("MSA | Mergentheim/Mosbach Security Agency");
 
         HBox hBox = new HBox();
