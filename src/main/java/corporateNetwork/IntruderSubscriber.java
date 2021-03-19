@@ -19,6 +19,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         queryGetParticipant.setParameter("name", name);
         Participant participant = (Participant) queryGetParticipant.list().get(0);
 
+        //TODO eig neuen Eintrag in der Postbox
         Query queryGetPostbox = event.getApp().getSession().createQuery("from Postbox P WHERE P.participantTo = :participantTo");
         queryGetPostbox.setParameter("participantTo", participant);
         Postbox postbox = (Postbox) queryGetPostbox.list().get(0);
@@ -31,7 +32,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         } else {
             System.out.println("intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
             postbox.setMessage(message);
-            event.getApp().executeCommands("set " + "intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
+            event.getApp().executeCommands("set intruder " + name + " cracked message from participant " + event.getParticipantSubscriberFrom().name + " | " + message);
         }
     }
 }

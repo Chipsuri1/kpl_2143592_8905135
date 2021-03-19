@@ -209,6 +209,7 @@ public class CorporateNetwork {
                         List query2List = query.list();
 
                         if (query1List.isEmpty() && query2List.isEmpty()) {
+                            app.executeCommands("set channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created");
                             Channel channel = new entitys.Channel(channelName, participants.get(0), participants.get(1));
                             ParticipantSubscriber participantSubscriber1 = participantSubscriberHashMap.get(participantName1);
                             ParticipantSubscriber participantSubscriber2 = participantSubscriberHashMap.get(participantName2);
@@ -216,7 +217,7 @@ public class CorporateNetwork {
                             channelHashMap.put(channelName, channelOfNetwork);
 
                             app.getSession().save(channel);
-                            result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " successfully created";
+                            result = "channel " + channelName + " from " + participantName1 + " to " + participantName2 + " created";
                         } else {
                             result = "communication channel between " + participantName1 + " and " + participantName2 + " already exists";
                         }
