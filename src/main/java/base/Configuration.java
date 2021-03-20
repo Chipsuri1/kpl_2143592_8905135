@@ -14,9 +14,6 @@ public enum Configuration {
 
     public final String commonPathToJavaArchive = userDirectory + fileSeparator + "components" + fileSeparator;
 
-    public final String inputDataFile = dataDirectory + fileSeparator + "input.txt";
-    public final String encryptedDataFile = dataDirectory + fileSeparator + "encrypted.txt";
-
     public final String pathToRSAJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator+ "rsa" + fileSeparator + "rsa.jar";
     public final String pathToRSACrackerJavaArchive = commonPathToJavaArchive + "rsa" + fileSeparator + "rsa_cracker" + fileSeparator + "rsa_cracker.jar";
     public final String pathToShiftJavaArchive = commonPathToJavaArchive + "shift" + fileSeparator + "shift" + fileSeparator + "shift.jar";
