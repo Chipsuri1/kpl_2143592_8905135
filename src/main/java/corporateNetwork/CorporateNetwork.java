@@ -286,7 +286,7 @@ public class CorporateNetwork {
                 eventBus.register(participantSubscriber);
 
                 app.getSession().save(participant);
-                Postbox postbox = new Postbox(participant);
+                Postbox postbox = new Postbox(participant, "Empty");
                 app.getSession().save(postbox);
                 result = "participant " + participantName + " with type " + typeString + " registered and postbox_" + participantName + " created";
             } else {

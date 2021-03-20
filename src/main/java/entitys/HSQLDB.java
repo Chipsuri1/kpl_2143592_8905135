@@ -205,21 +205,23 @@ public enum HSQLDB {
     }
 
     /*
-       [postbox_[participant_name]]
+       [postbox]
        id                  TINYINT NOT NULL
-       participant_from_id TINYINT NOT NULL
-       message             VARCHAR(50) NOT NULL
+       participant_from_id TINYINT
+       participant_to_id   TINYINT NOT NULL
+       message             VARCHAR(1000)
        timestamp           INT
      */
     public void createTablePostbox(String participantName) {
-        String table = "postbox_" + participantName;
+        String table = "postbox";
         System.out.println("--- createTablePostbox_" + participantName);
 
         StringBuilder sqlStringBuilder01 = new StringBuilder();
         sqlStringBuilder01.append("CREATE TABLE IF NOT EXISTS ").append(table).append(" (");
         sqlStringBuilder01.append("id TINYINT NOT NULL").append(",");
         sqlStringBuilder01.append("participant_from_id TINYINT NOT NULL").append(",");
-        sqlStringBuilder01.append("message VARCHAR(50) NOT NULL").append(",");
+        sqlStringBuilder01.append("participant_to_id TINYINT").append(",");
+        sqlStringBuilder01.append("message VARCHAR(1000)").append(",");
         sqlStringBuilder01.append("timestamp BIGINT NOT NULL").append(",");
         sqlStringBuilder01.append("PRIMARY KEY (id)");
         sqlStringBuilder01.append(")");
@@ -227,7 +229,7 @@ public enum HSQLDB {
         update(sqlStringBuilder01.toString());
 
         StringBuilder sqlStringBuilder02 = new StringBuilder();
-        sqlStringBuilder02.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT IF NOT EXISTS fk_postbox_").append(participantName);
+        sqlStringBuilder02.append("ALTER TABLE ").append(table).append(" ADD CONSTRAINT IF NOT EXISTS fk_postbox");
         sqlStringBuilder02.append(" FOREIGN KEY (participant_from_id) ");
         sqlStringBuilder02.append("REFERENCES participants (id) ");
         sqlStringBuilder02.append("ON DELETE CASCADE");

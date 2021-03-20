@@ -13,8 +13,9 @@ public class Postbox {
     @NotNull
     private Integer id;
 
-    public Postbox(Participant participantTo) {
+    public Postbox(Participant participantTo, String message) {
         this.participantTo = participantTo;
+        this.message = message;
         timestamp = Math.toIntExact((System.currentTimeMillis() / 1000L));
     }
 
@@ -29,7 +30,7 @@ public class Postbox {
     @JoinColumn(name = "participant_from_id")
     private Participant participantFrom;
 
-    @Column(name = "message")
+    @Column(name = "message", length = 1000)
     @NotNull
     private String message;
 
