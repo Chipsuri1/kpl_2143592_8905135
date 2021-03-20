@@ -32,11 +32,7 @@ public class AppForGUI {
         app.setupData();
         app.setupAlgo();
 
-//        String command1 = "crack encrypted message \"rtwumjzx\" using shift";
-//        String command2 = "crack encrypted message \"Yw\" using rsa and keyfile publicKeyfile.json";
         Configuration.instance.debugMode = true;
-//        app.executeCommands("crack encrypted message "{fhhnsj%ktw%ht{ni%nx%xytwji%ns%gznqinsl%fgh" using shift");
-//        app.executeCommands("crack encrypted message \"dg== ALA= LA== LA== XA== AL0= ZQ== bw== dw== IA== Fw== bw== LA== IA== dg== XA== CQ== bw== XA== ag== bw== ag== AIE= IA== Fw== ZQ== CQ== bw== XA== AL0= bw== ew== Gg== XA== OA== CQ== XA== AL0= Zw== bw== ALA= ew== LA== \" using rsa and keyfile publicKeyfile.json");
         app.executeCommands("register participant branch_hkg with type normal");
         app.executeCommands("register participant branch_cpt with type normal");
         app.executeCommands("register participant branch_sfo with type normal");

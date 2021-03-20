@@ -43,6 +43,8 @@ public class GUI extends Application{
         TextArea commandLineArea = new TextArea();
         commandLineArea.setWrapText(true);
 
+        commandLineArea.setText("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
+
         TextArea outputArea = new TextArea();
         outputArea.setWrapText(true);
         outputArea.setEditable(false);

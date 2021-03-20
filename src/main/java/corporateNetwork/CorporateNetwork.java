@@ -233,7 +233,7 @@ public class CorporateNetwork {
 
     public String receive(Intrude event) {
         app.startSession();
-        String result;
+        String result = "Channel not existing!";
         Query query;
         String[] inputStrings = event.getInput().split(" ");
         String channelName = inputStrings[2];
@@ -245,8 +245,8 @@ public class CorporateNetwork {
             corporateNetwork.Channel channel = channelHashMap.get(channelName);
             IntruderSubscriber intruderSubscriber = (IntruderSubscriber) participantSubscriberHashMap.get(participantName);
             channel.getEventBus().register(intruderSubscriber);
+            result = app.executeCommands("set " + participantName + " subscribed channel " + channelName);
         }
-        result = app.executeCommands("set " + participantName + " subscribed channel " + channelName);
         app.endSession();
         return result;
     }
