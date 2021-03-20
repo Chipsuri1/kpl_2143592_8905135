@@ -324,7 +324,6 @@ public class CorporateNetwork {
                 } else {
                     cipher = app.encrypt(algorithm, event.getMessage(), event.getFile());
 
-
                     query = app.getSession().createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
                     query.setParameter("participant1", participants.get(0));
                     query.setParameter("participant2", participants.get(1));
@@ -334,7 +333,6 @@ public class CorporateNetwork {
                         entitys.Channel channel = (entitys.Channel) queryList.get(0);
                         corporateNetwork.Channel netWorkChannel = channelHashMap.get(channel.getName());
 
-                        netWorkChannel.post(new MessageEvent(cipher, participantSubscriberHashMap.get(participantName1), participantSubscriberHashMap.get(participantName2), app, algorithm, event.getFile()));
 
                         query = app.getSession().createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
@@ -343,6 +341,7 @@ public class CorporateNetwork {
                         app.getSession().save(messageEntity);
 
                         result = participantName2 + " received new message";
+                        netWorkChannel.post(new MessageEvent(cipher, participantSubscriberHashMap.get(participantName1), participantSubscriberHashMap.get(participantName2), app, algorithm, event.getFile()));
 //                        app.endSession();
                     } else {
                         result = "no valid channel from " + participantName1 + " to " + participantName2;
