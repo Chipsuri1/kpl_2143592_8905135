@@ -11,3 +11,5 @@ Anforderung	                	                       Bewertung
 
 [S1] = 2143592
 [S2] = 8905135
+
+Adjust path to JarSigner in Configuration if necessary
