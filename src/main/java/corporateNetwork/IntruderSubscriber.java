@@ -24,7 +24,7 @@ public class IntruderSubscriber extends ParticipantSubscriber {
         Participant participantFrom = (Participant) queryGetParticipant.list().get(0);
 
         Postbox postbox = new Postbox(participantIntruder, "unknown");
-//        postbox.setParticipantFrom(participantFrom);
+        postbox.setParticipantFrom(participantFrom);
         event.setFile(new File("configuration/publicKeyfile.json"));
         String message = event.getApp().crackEncryptedMessage(event.getAlgorithm(), event.getCipher(), event.getFile());
 
