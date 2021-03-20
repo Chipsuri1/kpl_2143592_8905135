@@ -179,7 +179,6 @@ public class CorporateNetwork {
     public String receive(Create event) {
         String input = event.getInput();
 
-        app.startSession();
         Query query;
         String result = null;
         ArrayList<Participant> participants = new ArrayList<>();
@@ -194,6 +193,7 @@ public class CorporateNetwork {
                 if (participants.get(0).equals(participants.get(1))) {
                     result = participantName1 + " and " + participantName2 + " are identical – cannot create channel on itself";
                 } else {
+                    app.startSession();
                     query = app.getSession().createQuery("from Channel C WHERE C.name = :channelName");
                     query.setParameter("channelName", channelName);
                     if (query.list().isEmpty()) {
@@ -224,10 +224,10 @@ public class CorporateNetwork {
                     } else {
                         result = "channel " + channelName + " already exists";
                     }
+                    app.endSession();
                 }
             }
         }
-        app.endSession();
         return result;
     }
 
@@ -254,11 +254,11 @@ public class CorporateNetwork {
     public String receive(Register event) {
         String input = event.getInput();
         String result = null;
-        app.startSession();
         String[] inputStrings = input.split(" ");
         if (inputStrings.length == 6) {
             String participantName = inputStrings[2];
             String typeString = inputStrings[inputStrings.length - 1];
+            app.startSession();
             Query query = app.getSession().createQuery("from Participant P WHERE P.name = :participantName");
             query.setParameter("participantName", participantName);
             List resultList = query.list();
@@ -292,13 +292,13 @@ public class CorporateNetwork {
             } else {
                 result = "participant " + participantName + " already exists, using existing postbox_" + participantName;
             }
+            app.endSession();
+
         }
-        app.endSession();
         return result;
     }
 
     public String receive(Send event) {
-        app.startSession();
         String result = null;
         String cipher;
         String algorithm = null;
@@ -323,6 +323,7 @@ public class CorporateNetwork {
                     result = "no valid channel from " + participantName1 + " to " + participantName2;
                 } else {
                     cipher = app.encrypt(algorithm, event.getMessage(), event.getFile());
+                    app.startSession();
 
                     query = app.getSession().createQuery("from Channel C WHERE C.participant1 = :participant1 AND C.participant2 = :participant2");
                     query.setParameter("participant1", participants.get(0));
@@ -333,7 +334,6 @@ public class CorporateNetwork {
                         entitys.Channel channel = (entitys.Channel) queryList.get(0);
                         corporateNetwork.Channel netWorkChannel = channelHashMap.get(channel.getName());
 
-
                         query = app.getSession().createQuery("from Algorithm A WHERE A.name = :algorithm");
                         query.setParameter("algorithm", algorithm);
                         Algorithm algorithmEntity = (Algorithm) query.list().get(0);
@@ -341,9 +341,10 @@ public class CorporateNetwork {
                         app.getSession().save(messageEntity);
 
                         result = participantName2 + " received new message";
+                        app.endSession();
                         netWorkChannel.post(new MessageEvent(cipher, participantSubscriberHashMap.get(participantName1), participantSubscriberHashMap.get(participantName2), app, algorithm, event.getFile()));
-//                        app.endSession();
                     } else {
+                        app.endSession();
                         result = "no valid channel from " + participantName1 + " to " + participantName2;
                     }
                 }
@@ -351,7 +352,6 @@ public class CorporateNetwork {
                 result = "no valid channel from " + participantName1 + " to " + participantName2;
             }
         }
-        app.endSession();
         return result;
     }
 
@@ -367,7 +367,6 @@ public class CorporateNetwork {
         }
         app.endSession();
         return stringBuilder.toString();
-
     }
 
     public String receive(Drop event) {

@@ -183,17 +183,18 @@ public class AppForGUI {
             LogEngine.instance.writeLn("Cipher: " + cipher);
             LogEngine.instance.close();
         }
-        endSession();
         return cipher;
     }
 
 
     void tryToAddParticipantToList(ArrayList<Participant> participants, String participantName) {
+        startSession();
         Query query = session.createQuery("From Participant P WHERE P.name = :participantName");
         query.setParameter("participantName", participantName);
         if (!query.list().isEmpty()) {
             participants.add((Participant) query.list().get(0));
         }
+        endSession();
     }
 
     public String crackEncryptedMessage(String algorithm, String message, File file) {

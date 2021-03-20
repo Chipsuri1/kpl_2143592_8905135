@@ -38,7 +38,10 @@ public class ParticipantSubscriber extends Subscriber {
             queryGetPostbox.setParameter("participantTo", participant);
             Postbox postbox = (Postbox) queryGetPostbox.list().get(0);
 
-            if(postbox != null)postbox.setMessage(message);
+            if(postbox != null){
+                postbox.setMessage(message);
+            }
+            event.getApp().endSession();
             event.getApp().executeCommands("set " + name + " received new message");
         } else {
             System.out.println("This message is not for me!");
