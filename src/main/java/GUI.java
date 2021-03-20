@@ -73,11 +73,7 @@ public class GUI extends Application{
                 //Show latest logfile
                 switch (event.getCode()) {
                     case F3 -> {
-                        if (Configuration.instance.debugMode) {
-                            Configuration.instance.debugMode = false;
-                        } else {
-                            Configuration.instance.debugMode = true;
-                        }
+                        Configuration.instance.debugMode = !Configuration.instance.debugMode;
                         outputArea.setText("Debug mode is: " + Configuration.instance.debugMode);
                     }
                     case F5 -> {
@@ -103,11 +99,7 @@ public class GUI extends Application{
                 //Show latest logfile
                 switch (event.getCode()) {
                     case F3 -> {
-                        if (Configuration.instance.debugMode) {
-                            Configuration.instance.debugMode = false;
-                        } else {
-                            Configuration.instance.debugMode = true;
-                        }
+                        Configuration.instance.debugMode = !Configuration.instance.debugMode;
                         outputArea.setText("Debug mode is: " + Configuration.instance.debugMode);
                     }
                     case F5 -> {

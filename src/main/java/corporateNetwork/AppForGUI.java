@@ -2,7 +2,9 @@ package corporateNetwork;
 
 import base.Configuration;
 import base.LogEngine;
-import entitys.*;
+import entitys.Algorithm;
+import entitys.HibernateUtility;
+import entitys.Participant;
 import event.*;
 import factory.RSACrackerFactory;
 import factory.RSAFactory;
@@ -57,6 +59,7 @@ public class AppForGUI {
         app.executeCommands("register participant msa with type intruder");
 
         app.executeCommands("intrude channel hkg_wuh by msa");
+        app.executeCommands("drop channel hkg_wuh");
 
         app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using rsa and keyfile privateKeyfile.json");
         app.executeCommands("send message \"vaccine for covid is stored in building abc\" from branch_hkg to branch_wuh using shift and keyfile keyfile.json");
@@ -70,7 +73,7 @@ public class AppForGUI {
 
     public String executeCommands(String input) {
         String result = "Error";
-        try{
+        try {
             String command = input.split(" ")[0];
             boolean rsa = false;
             boolean shift = false;
@@ -99,7 +102,7 @@ public class AppForGUI {
                 case "set" -> setMessageToGUI(input);
                 default -> "invalid command, please check your input";
             };
-        }catch (Exception e){
+        } catch (Exception e) {
             e.printStackTrace();
         }
         return result;
@@ -202,7 +205,7 @@ public class AppForGUI {
             return crackEncryptedMessageShift(message);
         } else if (algorithm.equals("rsa")) {
             return crackEncryptedMessageRSA(message, file);
-        }else{
+        } else {
             return "Invalid algorithm. Please try again";
         }
     }
@@ -247,10 +250,9 @@ public class AppForGUI {
         }
     }
 
-    private String setMessageToGUI(String input){
+    private String setMessageToGUI(String input) {
         return input.replaceFirst("set ", "");
     }
-
 
     public void startSession() {
         sessionFactory = HibernateUtility.getSessionFactory();
@@ -276,7 +278,7 @@ public class AppForGUI {
         executeCommands("create channel syd_sfo from branch_syd to branch_sfo");
     }
 
-    public void setupAlgo(){
+    public void setupAlgo() {
         startSession();
         Algorithm algorithm = new Algorithm("rsa");
         session.save(algorithm);

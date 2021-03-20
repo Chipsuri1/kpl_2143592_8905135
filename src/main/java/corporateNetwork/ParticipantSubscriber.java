@@ -29,7 +29,7 @@ public class ParticipantSubscriber extends Subscriber {
             }
             String message = event.getApp().decrypt(event.getAlgorithm(), event.getCipher(), file);
 
-            event.getApp().startSession();
+//            event.getApp().startSession();
             Query queryGetParticipant = event.getApp().getSession().createQuery("from Participant P WHERE P.name = :name");
             queryGetParticipant.setParameter("name", name);
             Participant participant = (Participant) queryGetParticipant.list().get(0);
